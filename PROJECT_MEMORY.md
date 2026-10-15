@@ -158,3 +158,27 @@ python run.py --export
 | `install_release_1.0.sh` | 1-click Linux/macOS installer for Release 1.00 |
 | `START_LOCAL_WEBSITE.bat` | 1-click local web dashboard launcher |
 | `Nuveen_Grants_..._filled.pdf` | Completed UIC Nuveen grant budget application form |
+
+---
+
+## 5. Bilingual (Spanish / English) Architecture & Status (Ready to Resume)
+
+* **Goal:** Provide a Spanish language version by default on port 8000 (`http://localhost:8000/`) and on production (`https://pulse-mexico.com/`), with an interactive header toggle `[🇲🇽 ES | 🇺🇸 EN]` to switch seamlessly between English and Spanish.
+* **Work Completed:**
+  1. **Dual-Language Report Engine (`reports/report_generator.py`):**
+     * Fully implemented bilingual report generation supporting `lang="es"` (default) and `lang="en"`.
+     * Generates executive summaries, bullet takeaways, and full markdown briefings in both Spanish and English.
+     * Pre-generated and cached 10 report variants (National, Mérida & Yucatán, CDMX, GDL, MTY in both `es` and `en`) into `reports/daily_reports/` and `data/mexico_consumer_insights.db`.
+  2. **API Layer (`app.py`):**
+     * Updated `get_latest_report(region: str = "All", lang: str = "es")` to accept `lang` parameter and return the corresponding Spanish or English daily report.
+     * Supported URL endpoints: `/`, `/es`, and `/en`.
+  3. **Design & Switcher Styles (`frontend/style.css`):**
+     * Implemented `.lang-switch-group`, `.lang-btn`, and `.lang-btn.active` pill toggles in the header actions bar with glow effects.
+  4. **Frontend Structure & Spanish Defaults (`frontend/index.html`):**
+     * Inserted the `<div class="lang-switch-group">` with `#btn-lang-es` and `#btn-lang-en` buttons.
+     * Updated UI text, tab navigation, KPI cards, filter menus, and section headers to Spanish defaults with explicit element IDs for dynamic switching.
+* **Next Steps to Complete Translation Later:**
+  * In `frontend/app.js`: Connect the `setLanguage(lang)` function with the full `TRANSLATIONS` dictionary to toggle all element text dynamically and re-fetch `/api/reports/latest?region=${region}&lang=${lang}` when the user clicks the switch.
+  * Push updated files to Hetzner VPS (`89.167.22.10`) and restart container.
+  * Commit and push new release to GitHub repo `westland/MexicoConsumerPulse`.
+

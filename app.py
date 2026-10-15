@@ -195,6 +195,8 @@ if not frontend_dir.exists():
 app.mount("/static", StaticFiles(directory=str(frontend_dir)), name="static")
 
 @app.get("/")
+@app.get("/es")
+@app.get("/en")
 def serve_index():
     index_file = frontend_dir / "index.html"
     if index_file.exists():
@@ -259,25 +261,36 @@ def submit_product_void(payload: dict):
     return {"status": "success", "message": f"Successfully submitted wishlist item: {product_name}"}
 
 @app.get("/api/reports/latest")
-def get_latest_report(region: Optional[str] = Query("All")):
-    if region and region != "All":
-        date_str = datetime.now().strftime("%Y-%m-%d")
-        if region == "Mérida & Yucatán" or "mérida" in region.lower() or "yucatan" in region.lower():
-            report_key = f"{date_str}_merida_yucatan"
-            query_title = "%Mérida%"
-        else:
-            report_key = f"{date_str}_{region.lower().replace(' ', '_')}"
-            query_title = f"%{region}%"
+def get_latest_report(region: Optional[str] = Query("All"), lang: Optional[str] = Query("es")):
+    if lang not in ["es", "en"]:
+        lang = "es"
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    is_merida = region and (region == "Mérida & Yucatán" or "mérida" in region.lower() or "yucatan" in region.lower())
 
+    if is_merida:
+        report_key = f"{date_str}_merida_yucatan_{lang}"
         with db._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM daily_reports WHERE report_date = ? OR report_title LIKE ? ORDER BY id DESC LIMIT 1", (report_key, query_title))
+            cursor.execute("""
+                SELECT * FROM daily_reports 
+                WHERE report_date = ? 
+                ORDER BY id DESC LIMIT 1
+            """, (report_key,))
+            row = cursor.fetchone()
+            if row:
+                return dict(row)
+            
+            # fallback if legacy key exists
+            cursor.execute("""
+                SELECT * FROM daily_reports 
+                WHERE report_date LIKE '%merida%'
+                ORDER BY id DESC LIMIT 1
+            """)
             row = cursor.fetchone()
             if row:
                 return dict(row)
 
-        # Generate on the fly if not yet cached
-        res = report_gen.generate_report(region=region)
+        res = report_gen.generate_report(region="Mérida & Yucatán", lang=lang)
         return {
             "report_date": res["report_date"],
             "report_title": res["report_title"],
@@ -285,16 +298,35 @@ def get_latest_report(region: Optional[str] = Query("All")):
             "markdown_content": res["markdown"]
         }
 
-    # Default National Report
+    # National Report
+    report_key = f"{date_str}_{lang}"
     with db._get_connection() as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM daily_reports WHERE report_date NOT LIKE '%merida%' ORDER BY id DESC LIMIT 1")
+        cursor.execute("""
+            SELECT * FROM daily_reports 
+            WHERE report_date = ?
+            ORDER BY id DESC LIMIT 1
+        """, (report_key,))
         row = cursor.fetchone()
         if row:
             return dict(row)
 
-    res = report_gen.generate_report(region="All")
-    return db.get_latest_report()
+        cursor.execute("""
+            SELECT * FROM daily_reports 
+            WHERE report_date NOT LIKE '%merida%'
+            ORDER BY id DESC LIMIT 1
+        """)
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+
+    res = report_gen.generate_report(region="All", lang=lang)
+    return {
+        "report_date": res["report_date"],
+        "report_title": res["report_title"],
+        "executive_summary": "",
+        "markdown_content": res["markdown"]
+    }
 
 @app.get("/api/reports/list")
 def list_reports():

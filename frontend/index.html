@@ -26,22 +26,28 @@
       </div>
       <div class="swarm-status-pill" id="swarm-status-pill">
         <span class="pulse-dot"></span>
-        <span id="swarm-status-text">Swarm Ready • Daily Cycle Active</span>
+        <span id="swarm-status-text">Enjambre Listo • Ciclo Diario Activo</span>
       </div>
     </div>
 
     <div class="header-actions">
+      <!-- Language Switch Toggle -->
+      <div class="lang-switch-group" role="group" aria-label="Language Selector">
+        <button class="lang-btn active" id="btn-lang-es" type="button" title="Versión en Español">🇲🇽 ES</button>
+        <button class="lang-btn" id="btn-lang-en" type="button" title="English Version">🇺🇸 EN</button>
+      </div>
+
       <button class="btn btn-secondary" id="btn-export-csv" title="Download latest cleaned dataset as CSV">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Export CSV
+        <span id="btn-export-csv-text">Exportar CSV</span>
       </button>
       <button class="btn btn-secondary" id="btn-fb-session" title="Configure Facebook session for Vecinos & Bazar groups">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-        FB Session
+        <span id="btn-fb-session-text">Sesión FB</span>
       </button>
       <button class="btn btn-primary" id="btn-run-swarm" title="Trigger full data collection and synthesis run">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Run Agent Swarm
+        <span id="btn-run-swarm-text">Ejecutar Enjambre</span>
       </button>
     </div>
   </header>
@@ -52,27 +58,27 @@
     <!-- KPI Metric Highlights -->
     <section class="kpi-grid">
       <div class="kpi-card glass-panel" id="kpi-total">
-        <div class="kpi-label">Verified Problems Monitored</div>
+        <div class="kpi-label" id="kpi-label-total">Problemas Verificados Monitoreados</div>
         <div class="kpi-value" id="val-total-problems">--</div>
-        <div class="kpi-footer">Across CDMX, GDL, MTY, National</div>
+        <div class="kpi-footer" id="kpi-footer-total">En CDMX, GDL, MTY, Nacional</div>
       </div>
 
       <div class="kpi-card glass-panel alert-card" id="kpi-urgent">
-        <div class="kpi-label">High-Urgency Alerts (4-5)</div>
+        <div class="kpi-label" id="kpi-label-urgent">Alertas de Alta Urgencia (4-5)</div>
         <div class="kpi-value text-urgent" id="val-urgent-problems">--</div>
-        <div class="kpi-footer">Immediate service & legal failures</div>
+        <div class="kpi-footer" id="kpi-footer-urgent">Fallas críticas de servicio y legales</div>
       </div>
 
       <div class="kpi-card glass-panel" id="kpi-top-category">
-        <div class="kpi-label">Dominant Friction Vector</div>
+        <div class="kpi-label" id="kpi-label-top-cat">Vector Dominante de Fricción</div>
         <div class="kpi-value text-accent" id="val-top-category">--</div>
-        <div class="kpi-footer">Highest complaint frequency</div>
+        <div class="kpi-footer" id="kpi-footer-top-cat">Mayor frecuencia de quejas</div>
       </div>
 
       <div class="kpi-card glass-panel" id="kpi-audience">
-        <div class="kpi-label">Demographic Ratio</div>
+        <div class="kpi-label" id="kpi-label-audience">Proporción Demográfica</div>
         <div class="kpi-value" id="val-audience-split">--</div>
-        <div class="kpi-footer">Locals vs Expats vs Shared</div>
+        <div class="kpi-footer" id="kpi-footer-audience">Locales vs Extranjeros vs Compartido</div>
       </div>
     </section>
 
@@ -80,27 +86,27 @@
     <nav class="nav-tabs" role="tablist">
       <button class="tab-btn active" id="tab-btn-report" data-tab="tab-report">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        Daily Intelligence Report
+        <span id="tab-text-report">Informe Diario de Inteligencia</span>
       </button>
       <button class="tab-btn" id="tab-btn-explorer" data-tab="tab-explorer">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        Problem Explorer & Dataset
+        <span id="tab-text-explorer">Explorador de Problemas y Datos</span>
       </button>
       <button class="tab-btn" id="tab-btn-product-voids" data-tab="tab-product-voids">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-        🎁 "I Wish They Sold This" (Product Voids & Imports)
+        <span id="tab-text-product-voids">🎁 "Ojalá Vendieran Esto" (Vacíos e Importaciones)</span>
       </button>
       <button class="tab-btn" id="tab-btn-ventures" data-tab="tab-ventures">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-        Venture Opportunities Matrix
+        <span id="tab-text-ventures">Matriz de Oportunidades de Negocio</span>
       </button>
       <button class="tab-btn" id="tab-btn-whatsapp" data-tab="tab-whatsapp">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        WhatsApp Vecinos Ingestion
+        <span id="tab-text-whatsapp">Ingesta de WhatsApp Vecinos</span>
       </button>
       <button class="tab-btn" id="tab-btn-agents" data-tab="tab-agents">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-        🤖 Agent Operations & Activity Report
+        <span id="tab-text-agents">🤖 Operaciones y Reporte de Agentes</span>
       </button>
     </nav>
 
@@ -110,25 +116,25 @@
         <div class="report-header">
           <div>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-              <span class="badge-pill">Daily Executive Briefing</span>
-              <span class="badge badge-success" id="report-region-badge">All Regions</span>
+              <span class="badge-pill" id="badge-pill-report">Informe Ejecutivo Diario</span>
+              <span class="badge badge-success" id="report-region-badge">Todas las Regiones</span>
             </div>
-            <h2 id="report-title-display">Loading Daily Intelligence Report...</h2>
-            <p class="report-meta" id="report-meta-display">Synthesized by Autonomous Agent Swarm</p>
+            <h2 id="report-title-display">Cargando Informe Diario de Inteligencia...</h2>
+            <p class="report-meta" id="report-meta-display">Sintetizado por el Enjambre Autónomo de Agentes</p>
           </div>
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div class="region-menu-box">
-              <label for="select-report-region" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent-green); display: block; margin-bottom: 4px;">Select Report Scope:</label>
+              <label for="select-report-region" id="label-report-region" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent-green); display: block; margin-bottom: 4px;">Alcance del Informe:</label>
               <select id="select-report-region" class="filter-select" style="min-width: 260px; font-weight: 600; border-color: rgba(0, 230, 153, 0.4);">
-                <option value="All">🇲🇽 National Multi-City Report</option>
-                <option value="Mérida & Yucatán">🌴 Mérida & Yucatán Peninsula Report</option>
-                <option value="Mexico City (CDMX)">🏙️ Mexico City (CDMX)</option>
-                <option value="Guadalajara (GDL)">🌮 Guadalajara (GDL)</option>
-                <option value="Monterrey (MTY)">⛰️ Monterrey (MTY)</option>
+                <option value="All" id="opt-reg-all">🇲🇽 Reporte Nacional Multiciudad</option>
+                <option value="Mérida & Yucatán" id="opt-reg-merida">🌴 Reporte Mérida y Península de Yucatán</option>
+                <option value="Mexico City (CDMX)" id="opt-reg-cdmx">🏙️ Ciudad de México (CDMX)</option>
+                <option value="Guadalajara (GDL)" id="opt-reg-gdl">🌮 Guadalajara (GDL)</option>
+                <option value="Monterrey (MTY)" id="opt-reg-mty">⛰️ Monterrey (MTY)</option>
               </select>
             </div>
             <button class="btn btn-secondary btn-sm" id="btn-download-md" style="margin-top: 18px;">
-              Download Markdown
+              <span id="btn-download-md-text">Descargar Markdown</span>
             </button>
           </div>
         </div>
@@ -140,7 +146,7 @@
         <div class="report-body" id="report-rendered-markdown">
           <div class="loading-state">
             <div class="spinner"></div>
-            <span>Compiling daily multi-city analysis...</span>
+            <span>Compilando análisis multiciudad...</span>
           </div>
         </div>
       </div>
@@ -150,51 +156,51 @@
     <section class="tab-content" id="tab-explorer">
       <div class="filter-bar glass-panel">
         <div class="filter-group">
-          <label for="filter-city">City / Region</label>
+          <label for="filter-city" id="label-filter-city">Ciudad / Región</label>
           <select id="filter-city" class="filter-select">
-            <option value="All">All Regions</option>
-            <option value="Mérida & Yucatán">🌴 Mérida & Yucatán Peninsula</option>
-            <option value="Mexico City">Mexico City (CDMX)</option>
+            <option value="All" id="opt-city-all">Todas las Regiones</option>
+            <option value="Mérida & Yucatán">🌴 Mérida y Península de Yucatán</option>
+            <option value="Mexico City">Ciudad de México (CDMX)</option>
             <option value="Guadalajara">Guadalajara (GDL)</option>
             <option value="Monterrey">Monterrey (MTY)</option>
-            <option value="National">National / Multi-City</option>
+            <option value="National">Nacional / Multiciudad</option>
           </select>
         </div>
 
         <div class="filter-group">
-          <label for="filter-category">Category</label>
+          <label for="filter-category" id="label-filter-cat">Categoría</label>
           <select id="filter-category" class="filter-select">
-            <option value="All">All Categories</option>
-            <option value="Product Voids & Import Wishlist">🎁 Product Voids & Import Wishlist</option>
-            <option value="Infrastructure & Utilities">Infrastructure & Utilities</option>
-            <option value="Bureaucracy & GovTech">Bureaucracy & GovTech</option>
-            <option value="Home Maintenance & Trades">Home Maintenance & Trades</option>
-            <option value="Housing & Real Estate">Housing & Real Estate</option>
-            <option value="Marketplaces & Consumer Scams">Marketplaces & Scams</option>
-            <option value="Expat & Relocation Friction">Expat & Relocation</option>
+            <option value="All" id="opt-cat-all">Todas las Categorías</option>
+            <option value="Product Voids & Import Wishlist">🎁 Vacíos de Producto y Deseos de Importación</option>
+            <option value="Infrastructure & Utilities">Infraestructura y Servicios Públicos</option>
+            <option value="Bureaucracy & GovTech">Burocracia y Trámites Oficiales</option>
+            <option value="Home Maintenance & Trades">Mantenimiento del Hogar y Técnicos</option>
+            <option value="Housing & Real Estate">Vivienda y Bienes Raíces</option>
+            <option value="Marketplaces & Consumer Scams">Comercio y Fraudes al Consumidor</option>
+            <option value="Expat & Relocation Friction">Fricción de Reubicación y Extranjeros</option>
           </select>
         </div>
 
         <div class="filter-group">
-          <label for="filter-audience">Target Demographic</label>
+          <label for="filter-audience" id="label-filter-aud">Demografía Objetivo</label>
           <select id="filter-audience" class="filter-select">
-            <option value="All">All Audiences</option>
-            <option value="Local">Locals Only</option>
-            <option value="Expat">Expats Only</option>
-            <option value="Both">Shared / Both</option>
+            <option value="All" id="opt-aud-all">Todas las Audiencias</option>
+            <option value="Local" id="opt-aud-local">Solo Locales</option>
+            <option value="Expat" id="opt-aud-expat">Solo Extranjeros / Expats</option>
+            <option value="Both" id="opt-aud-both">Compartido / Ambos</option>
           </select>
         </div>
 
         <div class="filter-group search-group">
-          <label for="search-input">Search Keywords / Modismos</label>
-          <input type="text" id="search-input" class="search-input" placeholder="e.g. CFE, tandeo, plomero, SAT, casero, ojalá vendieran...">
+          <label for="search-input" id="label-search-input">Palabras Clave / Modismos</label>
+          <input type="text" id="search-input" class="search-input" placeholder="ej. CFE, tandeo, plomero, SAT, casero, ojalá vendieran...">
         </div>
       </div>
 
       <div class="table-container glass-panel">
         <div class="table-stats-bar">
-          <span id="records-counter">Showing 0 problems</span>
-          <span class="compliance-badge">🛡️ Ley Federal PII-Scrubbed</span>
+          <span id="records-counter">Mostrando 0 problemas</span>
+          <span class="compliance-badge" id="compliance-badge-text">🛡️ Anonimizado s/ Ley Federal</span>
         </div>
         <div class="problems-grid" id="problems-grid">
           <!-- Populated by JS -->
@@ -208,69 +214,69 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
           <div>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-              <span class="badge-pill">Cross-Border Retail Arbitrage</span>
-              <span class="badge badge-info" id="voids-counter-badge">13 Verified Voids</span>
-              <span class="badge badge-success">Live Social Harvester</span>
+              <span class="badge-pill" id="badge-pill-voids">Arbitraje Minorista Transfronterizo</span>
+              <span class="badge badge-info" id="voids-counter-badge">13 Vacíos Verificados</span>
+              <span class="badge badge-success" id="badge-social-harvester">Extractor Social en Vivo</span>
             </div>
-            <h2 style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 6px;">🎁 "I Wish They Sold This in Mexico" — Product Voids & Import Wishlist</h2>
-            <p style="color: var(--text-muted); font-size: 13px; max-width: 900px; line-height: 1.5;">
-              Autonomous AI agent scanning Mexican social media, expat forums, and e-commerce groups for verbatim consumer expressions of missing products (<em>"ojalá vendieran esto en México"</em>, <em>"por qué no venden en México"</em>, <em>"mandar a traer del gabacho"</em>). Identifies high-demand goods available in the U.S., China, Japan, or Europe that are currently absent from Mexican retail due to COFEPRIS regulations, NOM standards, customs tariffs, or brand omission.
+            <h2 id="voids-title-heading" style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 6px;">🎁 "Ojalá Vendieran Esto en México" — Vacíos de Producto y Deseos de Importación</h2>
+            <p id="voids-desc-text" style="color: var(--text-muted); font-size: 13px; max-width: 900px; line-height: 1.5;">
+              Agente autónomo de IA que rastrea redes sociales mexicanas, foros de extranjeros y grupos comerciales en busca de expresiones de productos no disponibles (<em>"ojalá vendieran esto en México"</em>, <em>"por qué no venden en México"</em>, <em>"mandar a traer del gabacho"</em>). Identifica productos de alta demanda disponibles en EE. UU., China, Japón o Europa que no se comercializan formalmente en México por regulaciones de COFEPRIS, normas NOM, aranceles o abandono de marca.
             </p>
           </div>
         </div>
 
         <!-- Quick Filter Pills for Origin Country -->
         <div style="display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; align-items: center;">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-right: 4px;">Filter by Origin:</span>
-          <button class="btn btn-secondary btn-sm void-filter-btn active" data-origin="All">🌍 All Origins</button>
-          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="USA">🇺🇸 USA Retail</button>
-          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="China">🇨🇳 China Direct</button>
-          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="Japan">🇯🇵 Japan & Korea</button>
-          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="Europe">🇪🇺 Europe</button>
+          <span id="void-filter-label" style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-right: 4px;">Filtrar por Origen:</span>
+          <button class="btn btn-secondary btn-sm void-filter-btn active" data-origin="All" id="void-btn-all">🌍 Todos los Orígenes</button>
+          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="USA" id="void-btn-usa">🇺🇸 Comercio EE. UU.</button>
+          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="China" id="void-btn-china">🇨🇳 Directo de China</button>
+          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="Japan" id="void-btn-japan">🇯🇵 Japón y Corea</button>
+          <button class="btn btn-secondary btn-sm void-filter-btn" data-origin="Europe" id="void-btn-europe">🇪🇺 Europa</button>
           <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
-            <input type="text" id="void-search-input" class="search-input" style="padding: 6px 14px; font-size: 12px; width: 220px;" placeholder="Search missing product...">
-            <button class="btn btn-primary btn-sm" id="btn-toggle-wish-form">+ Submit Wishlist Item</button>
+            <input type="text" id="void-search-input" class="search-input" style="padding: 6px 14px; font-size: 12px; width: 220px;" placeholder="Buscar producto no disponible...">
+            <button class="btn btn-primary btn-sm" id="btn-toggle-wish-form"><span id="btn-toggle-wish-text">+ Sugerir Producto Deseado</span></button>
           </div>
         </div>
       </div>
 
       <!-- Quick Wishlist Submission Panel (Collapsible) -->
       <div class="glass-panel" id="wish-submit-panel" style="padding: 24px; margin-bottom: 24px; display: none; border-color: rgba(0, 230, 153, 0.3);">
-        <h3 style="font-size: 16px; font-weight: 700; color: var(--accent-green); margin-bottom: 8px;">✦ Submit a Product You Wish Was Sold in Mexico</h3>
-        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Contribute to the research database. Submissions are processed by the Synthesis Agent to generate market opportunity hypotheses.</p>
+        <h3 id="wish-panel-title" style="font-size: 16px; font-weight: 700; color: var(--accent-green); margin-bottom: 8px;">✦ Sugiere un Producto que Quisieras que se Vendiera en México</h3>
+        <p id="wish-panel-desc" style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Contribuye a la base de investigación. Las sugerencias son procesadas por el Agente de Síntesis para formular hipótesis de mercado.</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
           <div>
-            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Product Name & Brand</label>
-            <input type="text" id="wish-product-name" class="filter-select" style="width: 100%; margin-top: 4px;" placeholder="e.g. Trader Joe's Cookie Butter, Countertop Dishwasher">
+            <label id="label-wish-prod" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Nombre del Producto y Marca</label>
+            <input type="text" id="wish-product-name" class="filter-select" style="width: 100%; margin-top: 4px;" placeholder="ej. Mantequilla de Galleta Trader Joe's, Lavavajillas compacto de encimera">
           </div>
           <div>
-            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Available In (Origin Country)</label>
+            <label id="label-wish-origin" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Disponible en (País de Origen)</label>
             <select id="wish-origin-country" class="filter-select" style="width: 100%; margin-top: 4px;">
-              <option value="USA">🇺🇸 United States</option>
+              <option value="USA">🇺🇸 Estados Unidos</option>
               <option value="China">🇨🇳 China</option>
-              <option value="Japan">🇯🇵 Japan</option>
-              <option value="Korea">🇰🇷 South Korea</option>
-              <option value="Europe">🇪🇺 Europe / Germany / UK</option>
+              <option value="Japan">🇯🇵 Japón</option>
+              <option value="Korea">🇰🇷 Corea del Sur</option>
+              <option value="Europe">🇪🇺 Europa / Alemania / Reino Unido</option>
             </select>
           </div>
           <div>
-            <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Your City / Region</label>
+            <label id="label-wish-city" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Tu Ciudad / Región</label>
             <select id="wish-city" class="filter-select" style="width: 100%; margin-top: 4px;">
-              <option value="Mexico City (CDMX)">Mexico City (CDMX)</option>
-              <option value="Mérida & Yucatán">Mérida & Yucatán</option>
+              <option value="Mexico City (CDMX)">Ciudad de México (CDMX)</option>
+              <option value="Mérida & Yucatán">Mérida y Yucatán</option>
               <option value="Guadalajara (GDL)">Guadalajara (GDL)</option>
               <option value="Monterrey (MTY)">Monterrey (MTY)</option>
-              <option value="National">National / Other</option>
+              <option value="National">Nacional / Otra</option>
             </select>
           </div>
         </div>
         <div style="margin-bottom: 12px;">
-          <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Why is it missing / What is your current workaround?</label>
-          <textarea id="wish-description" class="search-input" rows="2" style="width: 100%; margin-top: 4px; font-size: 12px;" placeholder="Explain why it's hard to get in Mexico, customs issues, or current workarounds..."></textarea>
+          <label id="label-wish-desc" style="font-size: 11px; font-weight: 700; color: var(--text-muted);">¿Por qué no se vende / Cómo lo consigues actualmente?</label>
+          <textarea id="wish-description" class="search-input" rows="2" style="width: 100%; margin-top: 4px; font-size: 12px;" placeholder="Explica por qué es difícil de conseguir en México, problemas de aduana o cómo lo resuelves actualmente..."></textarea>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
-          <button class="btn btn-secondary btn-sm" id="btn-cancel-wish">Cancel</button>
-          <button class="btn btn-primary btn-sm" id="btn-submit-wish">Submit to Research Swarm</button>
+          <button class="btn btn-secondary btn-sm" id="btn-cancel-wish">Cancelar</button>
+          <button class="btn btn-primary btn-sm" id="btn-submit-wish">Enviar al Enjambre de Investigación</button>
         </div>
       </div>
 
@@ -283,8 +289,8 @@
     <!-- TAB 3: VENTURE OPPORTUNITIES MATRIX -->
     <section class="tab-content" id="tab-ventures">
       <div class="ventures-intro glass-panel">
-        <h2>💡 Direct Market Opportunities & Venture Hypotheses</h2>
-        <p>These startup concepts and business models are synthesized automatically from high-friction consumer complaints, persistent service voids, and unaddressed community pain points across Mexican cities.</p>
+        <h2 id="ventures-title-heading">💡 Oportunidades Directas de Mercado e Hipótesis de Negocio</h2>
+        <p id="ventures-desc-text">Estos conceptos de startup y modelos de negocio se sintetizan automáticamente a partir de quejas de alta fricción, vacíos crónicos de servicio y problemas comunitarios en ciudades mexicanas.</p>
       </div>
 
       <div class="ventures-grid" id="ventures-grid">
@@ -295,23 +301,23 @@
     <!-- TAB 4: WHATSAPP VECINOS INGESTION -->
     <section class="tab-content" id="tab-whatsapp">
       <div class="glass-panel" style="padding: 28px; margin-bottom: 24px;">
-        <h2>💬 WhatsApp "Chat de Vecinos" Community Parser</h2>
-        <p style="color: var(--text-muted); margin: 8px 0 16px;">
-          The private neighborhood WhatsApp group is the fastest real-time sensor for water cuts, power surges, and handyman fraud in Mexico. Paste raw chat export lines below or load the sample Condesa street chat.
+        <h2 id="wa-title-heading">💬 Analizador Comunitario de "Chat de Vecinos" de WhatsApp</h2>
+        <p id="wa-desc-text" style="color: var(--text-muted); margin: 8px 0 16px;">
+          El grupo vecinal de WhatsApp es el sensor más rápido en tiempo real para cortes de agua, variaciones de voltaje y fraudes en México. Pega líneas de chat o carga el ejemplo de la Condesa.
         </p>
         <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
-          <input type="text" id="wa-group-name" class="filter-select" placeholder="Group Name (e.g. Vecinos Ámsterdam Condesa)" value="Vecinos Ámsterdam Condesa" style="flex: 1; min-width: 200px;">
-          <input type="text" id="wa-city" class="filter-select" placeholder="City" value="Mexico City (CDMX)" style="width: 200px;">
-          <button class="btn btn-secondary" id="btn-wa-load-sample">Load Sample Chat</button>
-          <button class="btn btn-primary" id="btn-wa-parse">Scrub & Ingest Chat</button>
+          <input type="text" id="wa-group-name" class="filter-select" placeholder="Nombre del Grupo (ej. Vecinos Ámsterdam Condesa)" value="Vecinos Ámsterdam Condesa" style="flex: 1; min-width: 200px;">
+          <input type="text" id="wa-city" class="filter-select" placeholder="Ciudad" value="Mexico City (CDMX)" style="width: 200px;">
+          <button class="btn btn-secondary" id="btn-wa-load-sample">Cargar Chat de Ejemplo</button>
+          <button class="btn btn-primary" id="btn-wa-parse">Anonimizar e Ingerir Chat</button>
         </div>
-        <textarea id="wa-chat-input" class="search-input" rows="8" style="width: 100%; font-family: var(--font-mono); font-size: 12px; resize: vertical;" placeholder="Paste WhatsApp chat export text here...
-Example format:
+        <textarea id="wa-chat-input" class="search-input" rows="8" style="width: 100%; font-family: var(--font-mono); font-size: 12px; resize: vertical;" placeholder="Pega el texto exportado de WhatsApp aquí...
+Ejemplo:
 [14/10/26, 08:15:30] +52 55 1234 5678: Vecinos, no cae agua en el edificio desde anoche. ¿Saben si Sacmex está en tandeo?"></textarea>
       </div>
 
       <div class="glass-panel" id="wa-results-panel" style="padding: 24px; display: none;">
-        <h3 style="font-size: 16px; margin-bottom: 12px; color: var(--accent-green);">✦ Extracted Community Problems</h3>
+        <h3 id="wa-results-title" style="font-size: 16px; margin-bottom: 12px; color: var(--accent-green);">✦ Problemas Comunitarios Extraídos</h3>
         <div id="wa-extracted-problems" class="problems-grid"></div>
       </div>
     </section>
@@ -324,17 +330,17 @@ Example format:
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
           <div>
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-              <span class="badge-pill">Swarm Executive Audit</span>
-              <span class="badge badge-success">7/7 Agents Operational</span>
-              <span class="badge badge-info">Localhost :8000 Active</span>
+              <span class="badge-pill" id="audit-badge-title">Auditoría Ejecutiva del Enjambre</span>
+              <span class="badge badge-success" id="audit-badge-agents">7/7 Agentes Operativos</span>
+              <span class="badge badge-info">Localhost :8000 Activo</span>
             </div>
-            <h2 style="font-size: 22px; font-weight: 800; color: #fff;">What the Autonomous Agents Have Done</h2>
-            <p style="color: var(--text-muted); font-size: 13px;">Full audit of data collection, PII redaction, Mexican slang NLP classification, and venture opportunity synthesis across Mexican metropolitan areas.</p>
+            <h2 id="audit-title-heading" style="font-size: 22px; font-weight: 800; color: #fff;">Actividad de los Agentes Autónomos</h2>
+            <p id="audit-desc-text" style="color: var(--text-muted); font-size: 13px;">Auditoría completa de recolección de datos, anonimización de datos personales (PII), análisis de modismos mexicanos y síntesis de oportunidades en urbes mexicanas.</p>
           </div>
           <div style="display: flex; gap: 10px;">
-            <button class="btn btn-primary" onclick="triggerSingleAgent('all')">
+            <button class="btn btn-primary" id="btn-run-full-swarm" onclick="triggerSingleAgent('all')">
               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Run Full Agent Swarm
+              <span id="btn-run-full-swarm-text">Ejecutar Enjambre Completo</span>
             </button>
           </div>
         </div>
