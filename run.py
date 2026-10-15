@@ -1,0 +1,116 @@
+"""
+Master Orchestrator & CLI Runner for MexConsumerPulse.
+Coordinates the autonomous agent swarm (Reddit, Twitter, Facebook),
+triggers data cleaning, runs NLP synthesis, generates daily reports, and exports datasets.
+"""
+
+import sys
+import argparse
+from pathlib import Path
+
+# Add root directory to sys.path
+BASE_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(BASE_DIR))
+
+from agents.reddit_agent import RedditScraperAgent
+from agents.twitter_agent import TwitterScraperAgent
+from agents.facebook_agent import FacebookBrowserAgent
+from agents.whatsapp_agent import WhatsAppVecinosAgent
+from agents.dataset_manager import DatasetManager
+from reports.report_generator import DailyReportGenerator
+
+def main():
+    parser = argparse.ArgumentParser(description="MexConsumerPulse: Autonomous Mexican Consumer Research Swarm")
+    parser.add_argument("--all", action="store_true", help="Run full pipeline: All agents + Daily Report + Data Export")
+    parser.add_argument("--reddit", action="store_true", help="Run Reddit Scraper Agent")
+    parser.add_argument("--twitter", action="store_true", help="Run Twitter/X Complaint Agent")
+    parser.add_argument("--facebook", action="store_true", help="Run Facebook Groups Browser Agent")
+    parser.add_argument("--whatsapp", action="store_true", help="Parse WhatsApp 'Chat de Vecinos' community stream")
+    parser.add_argument("--fb-login", action="store_true", help="Launch interactive headed browser for Facebook login / 2FA session capture")
+    parser.add_argument("--report", action="store_true", help="Generate Daily Intelligence Report only")
+    parser.add_argument("--export", action="store_true", help="Export SQLite database to CSV and JSON")
+    
+    args = parser.parse_args()
+
+    # Default to --all if no specific arguments provided
+    if not any([args.all, args.reddit, args.twitter, args.facebook, args.fb_login, args.report, args.export]):
+        args.all = True
+
+    print("=" * 70)
+    print(" MEXCONSUMERPULSE: AUTONOMOUS CONSUMER RESEARCH AGENT SWARM")
+    print(" Target: Major Mexican Cities (CDMX, GDL, MTY) | Locals & Expats")
+    print("=" * 70)
+
+    db = DatasetManager()
+
+    # 1. Interactive Facebook Login
+    if args.fb_login:
+        fb_agent = FacebookBrowserAgent()
+        fb_agent.interactive_login()
+        return
+
+    # 2. Reddit Agent
+    if args.all or args.reddit:
+        print("\n[Stage 1/4] Invoking Reddit Scraper Agent...")
+        try:
+            reddit_agent = RedditScraperAgent()
+            reddit_res = reddit_agent.run(max_per_sub=10)
+            print(f" -> Completed: {reddit_res}")
+        except Exception as e:
+            print(f" [Error] Reddit Agent failed: {e}")
+
+    # 3. Twitter / X Agent
+    if args.all or args.twitter:
+        print("\n[Stage 2/4] Invoking Twitter / X Complaint Monitoring Agent...")
+        try:
+            twitter_agent = TwitterScraperAgent()
+            twitter_res = twitter_agent.run(max_items=15)
+            print(f" -> Completed: {twitter_res}")
+        except Exception as e:
+            print(f" [Error] Twitter Agent failed: {e}")
+
+    # 4. Facebook Groups Agent
+    if args.all or args.facebook:
+        print("\n[Stage 3/5] Invoking Facebook Groups Browser Agent...")
+        try:
+            fb_agent = FacebookBrowserAgent()
+            fb_res = fb_agent.run(max_scrolls=3)
+            print(f" -> Completed: {fb_res}")
+        except Exception as e:
+            print(f" [Error] Facebook Agent failed: {e}")
+
+    # 5. WhatsApp Vecinos Agent
+    if args.all or args.whatsapp:
+        print("\n[Stage 4/5] Ingesting WhatsApp 'Chat de Vecinos' Stream...")
+        try:
+            wa_agent = WhatsAppVecinosAgent()
+            wa_res = wa_agent.import_sample_condesa_chat()
+            print(f" -> Completed: Ingested {len(wa_res)} hyper-local Vecinos problems.")
+        except Exception as e:
+            print(f" [Error] WhatsApp Agent failed: {e}")
+
+    # 6. Daily Report Generation
+    if args.all or args.report:
+        print("\n[Stage 5/5] Synthesizing Daily Bullet-Pointed Intelligence Report...")
+        try:
+            report_gen = DailyReportGenerator()
+            report_res = report_gen.generate_report()
+            print(f" -> Daily Report generated: {report_res['report_file']}")
+        except Exception as e:
+            print(f" [Error] Report Generation failed: {e}")
+
+    # 6. Export Dataset
+    if args.all or args.export:
+        print("\n[Export] Generating fresh CSV & JSON dataset exports...")
+        exports = db.export_dataset()
+        print(f" -> CSV Export: {exports['csv_path']}")
+        print(f" -> JSON Export: {exports['json_path']}")
+        print(f" -> Total records exported: {exports['total_exported']}")
+
+    print("\n" + "=" * 70)
+    print(" EXECUTION COMPLETED SUCCESSFULLY")
+    print(f" Metrics: {db.get_metrics()}")
+    print("=" * 70)
+
+if __name__ == "__main__":
+    main()

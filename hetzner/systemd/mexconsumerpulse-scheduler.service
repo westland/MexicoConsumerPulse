@@ -1,0 +1,15 @@
+[Unit]
+Description=MexConsumerPulse 24-Hour Autonomous Scraper Scheduler
+After=network.target mexconsumerpulse.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/mexconsumerpulse
+ExecStart=/usr/bin/python3 scheduler.py --interval-hours 24
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # Web Dashboard & REST API
+  web:
+    build: .
+    container_name: mexconsumerpulse_web
+    restart: always
+    ports:
+      - "8080:8000"
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+    command: ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/metrics"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Autonomous 24-Hour Scraper & Report Scheduler
+  scheduler:
+    build: .
+    container_name: mexconsumerpulse_scheduler
+    restart: always
+    volumes:
+      - ./data:/app/data
+      - ./reports:/app/reports
+    command: ["python", "scheduler.py", "--interval-hours", "24"]
+    depends_on:
+      - web
