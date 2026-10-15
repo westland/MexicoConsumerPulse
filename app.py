@@ -156,20 +156,34 @@ def get_agents_activity():
                 "icon": "📊",
                 "status": "Active • Publishing",
                 "target": "National Multi-City & Mérida/Yucatán Regional Briefings",
-                "records_harvested": 2,
+                "records_harvested": 5,
                 "action_summary": "Synthesized executive briefings with sector breakdown, regional pain matrices, and exportable Markdown.",
                 "key_findings": [
                     "Published Mexican Urban Consumer Intelligence Report (National)",
                     "Published Mérida & Yucatán Regional Consumer Intelligence Briefing"
                 ]
+            },
+            {
+                "id": "product_voids",
+                "name": "Product Void & Cross-Border Retail Harvester",
+                "icon": "🎁",
+                "status": "Active • Tracking Voids",
+                "target": "US, China, Japan, EU retail gaps & Mexican consumer wishlists",
+                "records_harvested": len(db.get_product_voids()),
+                "action_summary": "Monitors 'I wish they sold this in Mexico' ('Ojalá vendieran esto') across social platforms, identifying goods unavailable domestically.",
+                "key_findings": [
+                    "High demand for countertop compact dishwashers blocked by NOM 60cm retail default",
+                    "Trader Joe's gourmet seasonings commanding 400% markup on Instagram grey market",
+                    "COFEPRIS OTC classification restrictions blocking bulk generic allergy and melatonin products"
+                ]
             }
         ],
         "hetzner_deployment_status": {
-            "target": "89.167.22.10",
-            "state": "Standby on Desktop",
-            "script": "C:\\Users\\chris\\Desktop\\DEPLOY_TO_HETZNER.bat",
-            "containers": ["mexconsumerpulse_web (port 8000)", "mexconsumerpulse_scheduler (24h)"],
-            "notes": "All deployment files, Docker configs, and remote SSH scripts are saved and ready to run with 1 click."
+            "target": "pulse-mexico.com (89.167.22.10)",
+            "state": "Live & SSL Secured",
+            "script": "C:\\Users\\chris\\Desktop\\Market Research Mexico\\hetzner",
+            "containers": ["mexconsumerpulse_web (port 8080->8000)", "Nginx reverse proxy (443 Let's Encrypt)"],
+            "notes": "Live production environment serving https://pulse-mexico.com/"
         }
     }
 
@@ -199,6 +213,50 @@ def get_problems(
     limit: int = Query(100, ge=1, le=1000)
 ):
     return db.get_all_problems(limit=limit, city=city, category=category, audience=audience)
+
+@app.get("/api/product-voids")
+def get_product_voids(
+    origin: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=500)
+):
+    voids = db.get_product_voids(limit=limit)
+    if origin and origin != "All":
+        voids = [v for v in voids if origin.lower() in v.get("content", "").lower() or origin.lower() in v.get("title", "").lower() or origin.lower() in v.get("venture_concept", "").lower()]
+    return voids
+
+@app.post("/api/product-voids/submit")
+def submit_product_void(payload: dict):
+    product_name = payload.get("product_name", "")
+    origin_country = payload.get("origin_country", "USA")
+    description = payload.get("description", "")
+    city = payload.get("city", "National")
+    
+    if not product_name:
+        raise HTTPException(status_code=400, detail="Product name is required.")
+        
+    record = {
+        "title": f"Ojalá vendieran en México: {product_name}",
+        "content": f"Demanda de producto no disponible: {product_name} (Disponible en {origin_country}). {description}",
+        "source_platform": "Community Wishlist Submissions",
+        "source_url": "https://pulse-mexico.com/wishlist",
+        "city": city,
+        "colonia": "Community Wishlist",
+        "category": "Product Voids & Import Wishlist",
+        "confidence": 0.99,
+        "audience": "Both",
+        "urgency": 3,
+        "sentiment": "Inquiring / Service Gap",
+        "matched_slang": [{"term": "ojalá vendieran", "meaning": "Direct user submitted product void"}],
+        "problem_summary": f"Demanda de consumidores mexicanos por {product_name} disponible en {origin_country}.",
+        "solution_found": "Actualmente inexistente en canales formales de retail en México.",
+        "market_opportunity": {
+            "venture_concept": f"Cross-Border Import & Distribution of {product_name}",
+            "solution_summary": f"Import arbitrage and local fulfillment opportunity for {product_name} from {origin_country} into the Mexican market."
+        }
+    }
+    
+    db.insert_problem(record)
+    return {"status": "success", "message": f"Successfully submitted wishlist item: {product_name}"}
 
 @app.get("/api/reports/latest")
 def get_latest_report(region: Optional[str] = Query("All")):

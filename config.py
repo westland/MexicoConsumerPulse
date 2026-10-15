@@ -63,7 +63,10 @@ TARGET_SUBREDDITS = [
     # Expat / Foreigner Subreddits
     {"name": "mexicoexpats", "city": "National", "audience": "Expat"},
     {"name": "expats", "city": "National", "audience": "Expat", "filter_keyword": "Mexico"},
-    {"name": "digitalnomad", "city": "National", "audience": "Expat", "filter_keyword": "Mexico"}
+    {"name": "digitalnomad", "city": "National", "audience": "Expat", "filter_keyword": "Mexico"},
+    # E-Commerce, Imports & Product Void Communities
+    {"name": "ShopeeMexico", "city": "National", "audience": "Local"},
+    {"name": "mexicofinanzas", "city": "National", "audience": "Both"}
 ]
 
 # Targeted Facebook Groups (Curated list with search queries & identifiers)
@@ -76,10 +79,12 @@ FACEBOOK_TARGET_GROUPS = [
     {"name": "Vecinos San Pedro Garza García", "city": "Monterrey (MTY)", "type": "vecinos", "url": "https://www.facebook.com/groups/vecinosspgg"},
     {"name": "Vecinos Mérida Centro y Norte", "city": "Mérida & Yucatán", "type": "vecinos", "url": "https://www.facebook.com/groups/vecinosmerida"},
     {"name": "Quejas y Servicios Mérida / Yucatán", "city": "Mérida & Yucatán", "type": "vecinos", "url": "https://www.facebook.com/groups/quejasmerida"},
-    # Bazar / Marketplace
+    # Bazar / Marketplace & Import Communities
     {"name": "Bazar Coyoacán", "city": "Mexico City (CDMX)", "type": "bazar", "url": "https://www.facebook.com/groups/bazarcoyoacan"},
     {"name": "Bazar Polanco", "city": "Mexico City (CDMX)", "type": "bazar", "url": "https://www.facebook.com/groups/bazarpolanco"},
     {"name": "Bazar Mérida Norte y Altabrisa", "city": "Mérida & Yucatán", "type": "bazar", "url": "https://www.facebook.com/groups/bazarmeridanorte"},
+    {"name": "Compras por Internet México (Amazon US, Taobao, AliExpress)", "city": "National", "type": "bazar", "url": "https://www.facebook.com/groups/comprasinternetmexico"},
+    {"name": "Fayuca y Envíos USA - México PoBox", "city": "National", "type": "bazar", "url": "https://www.facebook.com/groups/fayucausa"},
     # Expat Communities
     {"name": "Foreigners & Expats in Mexico City (CDMX)", "city": "Mexico City (CDMX)", "type": "expat", "url": "https://www.facebook.com/groups/expatscdmx"},
     {"name": "Expats in Guadalajara", "city": "Guadalajara (GDL)", "type": "expat", "url": "https://www.facebook.com/groups/expatsgdl"},
@@ -91,7 +96,7 @@ TWITTER_MONITORS = {
     "official_handles": [
         "@SATMX", "@CFEmx", "@CFE_Contigo", "@SacmexCDMX", "@MetroCDMX",
         "@AtencionCDMX", "@Profeco", "@GobCDMX", "@AytoGDL", "@mtygob",
-        "@AyuntaMerida", "@JAPAYOficial", "@GobYucatan"
+        "@AyuntaMerida", "@JAPAYOficial", "@GobYucatan", "@COFEPRIS", "@AduanasMx"
     ],
     "complaint_queries": [
         "SAT no funciona",
@@ -105,10 +110,15 @@ TWITTER_MONITORS = {
         "estafa inmobiliaria",
         "poliza juridica fraude",
         "corte de agua Guadalajara",
-        "corte de luz Monterrey"
+        "corte de luz Monterrey",
+        "ojalá vendieran en méxico",
+        "por qué no venden en méxico",
+        "no hay en méxico amazon",
+        "aduana retuvo paquete cofepris",
+        "traer de usa fayuca"
     ],
     "hashtags": [
-        "#CDMX", "#AtencionCiudadana", "#CFE", "#SAT", "#FugaDeAgua", "#GDL", "#Monterrey", "#Merida", "#Yucatan", "#JAPAY"
+        "#CDMX", "#AtencionCiudadana", "#CFE", "#SAT", "#FugaDeAgua", "#GDL", "#Monterrey", "#Merida", "#Yucatan", "#JAPAY", "#Aduana", "#COFEPRIS"
     ]
 }
 
@@ -150,6 +160,18 @@ PROBLEM_KEYWORDS = {
         "apostilled documents", "tax residency sat", "mexico rent deposit refund",
         "safety condesa roma", "scam foreigner rental", "merida expat trust fideicomiso",
         "inah permits expat renovation"
+    ],
+    "Product Voids & Import Wishlist": [
+        "ojalá vendieran", "por qué no venden en méxico", "quisiera que vendieran en méxico",
+        "no hay en méxico", "no se consigue en méxico", "en amazon méxico no hay",
+        "mandar a traer de usa", "comprar en china", "traer del gabacho", "fayuca moderna",
+        "traer de laredo", "traer de mcallen", "traer de san diego", "aduana retuvo paquete",
+        "cofepris no deja pasar", "arancel aduana", "impuesto paquete dhl",
+        "i wish they sold", "can't find this in mexico", "why isn't this in mexico",
+        "missing in mexico", "not available in mexico", "trader joe's mexico",
+        "import from us", "import from china", "taobao mexico", "aliexpress customs mexico",
+        "countertop dishwasher mexico", "allergy generic bulk", "melatonin 5mg 10mg",
+        "standing desk converter", "smart home matter zigbee"
     ]
 }
 
@@ -173,5 +195,11 @@ MEXICAN_SLANG_MAP = {
     "fiador con bien raíz": {"meaning": "Requirement of real estate deed guarantor in same city to rent an apartment", "severity": 4, "category": "Housing & Real Estate"},
     "pipa de agua": {"meaning": "Emergency water tanker truck necessitated by dry pipes", "severity": 4, "category": "Infrastructure & Utilities"},
     "bachezote": {"meaning": "Severe street pothole causing vehicle damage", "severity": 3, "category": "Infrastructure & Utilities"},
-    "cobro fantasma": {"meaning": "Phantom / fraudulent utility billing spike", "severity": 4, "category": "Infrastructure & Utilities"}
+    "cobro fantasma": {"meaning": "Phantom / fraudulent utility billing spike", "severity": 4, "category": "Infrastructure & Utilities"},
+    "ojalá vendieran / ojalá hubiera en méxico": {"meaning": "Unmet consumer product void / High cross-border import demand", "severity": 4, "category": "Product Voids & Import Wishlist"},
+    "mandar a traer del gabacho / traer de usa": {"meaning": "Cross-border informal purchasing to bypass Mexican retail availability gaps", "severity": 3, "category": "Product Voids & Import Wishlist"},
+    "me lo atoró la aduana / paquete retenido": {"meaning": "Customs confiscation or 19%+ import tax barrier on foreign goods", "severity": 4, "category": "Product Voids & Import Wishlist"},
+    "fayuca / fayuquero moderno": {"meaning": "Informal cross-border courier arbitrage for goods unavailable domestically", "severity": 3, "category": "Product Voids & Import Wishlist"},
+    "no llega a méxico / no hacen envíos a méxico": {"meaning": "Geographic exclusion from international e-commerce & brand direct distribution", "severity": 4, "category": "Product Voids & Import Wishlist"},
+    "pedir por aliexpress / taobao": {"meaning": "Direct China sourcing for tech and household goods missing in Mexican retail", "severity": 3, "category": "Product Voids & Import Wishlist"}
 }

@@ -150,11 +150,33 @@ class DailyReportGenerator:
                 md_lines.append(f"- **Market Gap**: {summary}")
                 md_lines.append(f"- **Platform Signal**: Derived from discussions on {p.get('source_platform')}")
                 md_lines.append("")
-                if len(concepts_seen) >= 4:
+                if len(concepts_seen) >= 6:
                     break
 
-        md_lines.append("## 6. Verbatim Field Quotes (Anonymized)")
-        for idx, p in enumerate(problems[:5], 1):
+        # Product Voids & Cross-Border Retail Arbitrage Intelligence Section
+        product_voids = [p for p in problems if p.get("category") == "Product Voids & Import Wishlist"]
+        if not product_voids:
+            product_voids = self.db.get_product_voids(limit=10)
+
+        if product_voids:
+            md_lines.append("## 6. Cross-Border Product Voids & 'I Wish They Sold This in Mexico' Intelligence")
+            md_lines.append("Analysis of foreign consumer goods widely available in the U.S., China, Japan, or Europe that Mexican consumers actively search for but cannot purchase domestically due to regulatory, tariff, or distribution barriers.\n")
+            md_lines.append("| Missing Product / Feature | Origin Country | Key Barrier in Mexico | Current Consumer Workaround | Venture / Import Arbitrage |")
+            md_lines.append("| :--- | :--- | :--- | :--- | :--- |")
+            for pv in product_voids[:8]:
+                title_short = pv.get('title', '').replace('Ojalá vendieran en México los ', '').replace('Ojalá vendieran ', '')[:45]
+                origin = "🇺🇸 USA" if "trader" in title_short.lower() or "melatonina" in title_short.lower() or "creami" in title_short.lower() or "areneros" in title_short.lower() else ("🇨🇳 China" if "zigbee" in title_short.lower() or "aspiradoras" in title_short.lower() or "molinos" in title_short.lower() else ("🇯🇵 Japan / 🇰🇷 Korea" if "bloqueadores" in title_short.lower() or "deshumidificadores" in title_short.lower() else "🇺🇸 USA / 🇨🇳 China"))
+                if "progreso" in title_short.lower() or "herramientas" in title_short.lower():
+                    origin = "🇪🇺 Europe / 🇺🇸 USA"
+                
+                barrier = pv.get('problem_summary', '')[:85]
+                workaround = pv.get('solution_found', '')[:75]
+                opp = pv.get('venture_concept', '')[:65]
+                md_lines.append(f"| **{title_short}** | {origin} | {barrier}... | {workaround}... | *{opp}* |")
+            md_lines.append("")
+
+        md_lines.append("## 7. Verbatim Field Quotes (Anonymized)")
+        for idx, p in enumerate(problems[:6], 1):
             md_lines.append(f"> *\"{p.get('content', '')[:160]}...\"*")
             md_lines.append(f"> — **Source**: {p.get('source_platform')} | **City**: {p.get('city')}\n")
 

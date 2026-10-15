@@ -5,18 +5,22 @@
 
 // State
 let allProblems = [];
+let allProductVoids = [];
 let latestReportData = null;
+let currentVoidOrigin = "All";
 
 document.addEventListener("DOMContentLoaded", () => {
   initTabs();
   initModals();
   initActions();
   initFilters();
+  initProductVoids();
 
   // Load initial data
   loadMetrics();
   loadLatestReport();
   loadProblems();
+  loadProductVoids();
 });
 
 // 1. Tab Navigation
@@ -496,4 +500,211 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// 10. Product Voids & "I Wish They Sold This" Handler
+function initProductVoids() {
+  // Origin Filter Buttons
+  const filterBtns = document.querySelectorAll(".void-filter-btn");
+  filterBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      filterBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentVoidOrigin = btn.getAttribute("data-origin") || "All";
+      filterAndRenderProductVoids();
+    });
+  });
+
+  // Search Input
+  const searchInput = document.getElementById("void-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      filterAndRenderProductVoids();
+    });
+  }
+
+  // Toggle Submission Form
+  const toggleBtn = document.getElementById("btn-toggle-wish-form");
+  const cancelBtn = document.getElementById("btn-cancel-wish");
+  const formPanel = document.getElementById("wish-submit-panel");
+
+  if (toggleBtn && formPanel) {
+    toggleBtn.addEventListener("click", () => {
+      const isHidden = formPanel.style.display === "none" || !formPanel.style.display;
+      formPanel.style.display = isHidden ? "block" : "none";
+      if (isHidden) {
+        document.getElementById("wish-product-name")?.focus();
+      }
+    });
+  }
+
+  if (cancelBtn && formPanel) {
+    cancelBtn.addEventListener("click", () => {
+      formPanel.style.display = "none";
+    });
+  }
+
+  // Submit Wishlist Item
+  const submitBtn = document.getElementById("btn-submit-wish");
+  if (submitBtn) {
+    submitBtn.addEventListener("click", async () => {
+      const prodName = document.getElementById("wish-product-name")?.value.trim();
+      const origin = document.getElementById("wish-origin-country")?.value || "USA";
+      const city = document.getElementById("wish-city")?.value || "National";
+      const desc = document.getElementById("wish-description")?.value.trim() || "";
+
+      if (!prodName) {
+        showToast("Please enter a product name.");
+        return;
+      }
+
+      showToast(`Submitting wishlist item '${prodName}'...`);
+      try {
+        const res = await fetch("/api/product-voids/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_name: prodName,
+            origin_country: origin,
+            city: city,
+            description: desc
+          })
+        });
+
+        const data = await res.json();
+        showToast(data.message || "Product void logged successfully!");
+        
+        // Reset form
+        const inputElem = document.getElementById("wish-product-name");
+        if (inputElem) inputElem.value = "";
+        const descElem = document.getElementById("wish-description");
+        if (descElem) descElem.value = "";
+        if (formPanel) formPanel.style.display = "none";
+
+        // Refresh data
+        loadProductVoids();
+        loadMetrics();
+        loadProblems();
+      } catch (err) {
+        showToast("Error submitting wishlist item: " + err.message);
+      }
+    });
+  }
+}
+
+async function loadProductVoids() {
+  try {
+    const res = await fetch("/api/product-voids");
+    allProductVoids = await res.json();
+    
+    const counterBadge = document.getElementById("voids-counter-badge");
+    if (counterBadge) {
+      counterBadge.textContent = `${allProductVoids.length} Verified Voids`;
+    }
+
+    filterAndRenderProductVoids();
+  } catch (err) {
+    console.error("Failed to load product voids:", err);
+  }
+}
+
+function filterAndRenderProductVoids() {
+  const searchInput = document.getElementById("void-search-input");
+  const query = (searchInput ? searchInput.value : "").toLowerCase().trim();
+
+  let filtered = allProductVoids;
+
+  if (currentVoidOrigin !== "All") {
+    filtered = filtered.filter(v => {
+      const txt = `${v.title} ${v.content} ${v.venture_concept || ''}`.toLowerCase();
+      if (currentVoidOrigin === "USA") return txt.includes("usa") || txt.includes("estados unidos") || txt.includes("trader") || txt.includes("target") || txt.includes("costco") || txt.includes("gabacho");
+      if (currentVoidOrigin === "China") return txt.includes("china") || txt.includes("aliexpress") || txt.includes("taobao") || txt.includes("sonoff") || txt.includes("roborock");
+      if (currentVoidOrigin === "Japan") return txt.includes("japón") || txt.includes("japan") || txt.includes("corea") || txt.includes("korea") || txt.includes("biore") || txt.includes("deshumidificadores");
+      if (currentVoidOrigin === "Europe") return txt.includes("europa") || txt.includes("europe") || txt.includes("alemania") || txt.includes("wera") || txt.includes("progreso");
+      return true;
+    });
+  }
+
+  if (query) {
+    filtered = filtered.filter(v => {
+      const txt = `${v.title} ${v.content} ${v.problem_summary || ''} ${v.venture_concept || ''}`.toLowerCase();
+      return txt.includes(query);
+    });
+  }
+
+  renderProductVoids(filtered);
+}
+
+function renderProductVoids(voids) {
+  const grid = document.getElementById("product-voids-grid");
+  if (!grid) return;
+
+  if (!voids.length) {
+    grid.innerHTML = `
+      <div class="empty-state glass-panel" style="grid-column: 1 / -1; padding: 32px; text-align: center;">
+        <span style="font-size: 32px;">🔍</span>
+        <h3 style="margin-top: 8px;">No product voids matching current filters</h3>
+        <p style="color: var(--text-muted); font-size: 13px;">Try switching origin countries or click '+ Submit Wishlist Item' to add one.</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = voids.map(v => {
+    // Detect origin badge
+    const txt = `${v.title} ${v.content}`.toLowerCase();
+    let originBadge = "🌍 International";
+    let originClass = "badge-info";
+    if (txt.includes("trader") || txt.includes("melatonina") || txt.includes("creami") || txt.includes("areneros") || txt.includes("costco") || txt.includes("usa") || txt.includes("gabacho")) {
+      originBadge = "🇺🇸 Available in USA Retail";
+      originClass = "badge-success";
+    } else if (txt.includes("china") || txt.includes("zigbee") || txt.includes("aspiradoras") || txt.includes("molinos") || txt.includes("aliexpress")) {
+      originBadge = "🇨🇳 Direct from China";
+      originClass = "badge-accent";
+    } else if (txt.includes("japón") || txt.includes("japan") || txt.includes("corea") || txt.includes("korea") || txt.includes("biore") || txt.includes("deshumidificadores")) {
+      originBadge = "🇯🇵 Japan & Korea Specialty";
+      originClass = "badge-purple";
+    } else if (txt.includes("europa") || txt.includes("europe") || txt.includes("progreso") || txt.includes("alemana")) {
+      originBadge = "🇪🇺 European Direct";
+      originClass = "badge-info";
+    }
+
+    const urgencyStars = "🔴".repeat(v.urgency || 3);
+
+    return `
+      <div class="problem-card glass-panel" style="border-top: 3px solid var(--accent-cyan); display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="problem-card-header">
+            <span class="badge ${originClass}">${originBadge}</span>
+            <span class="problem-urgency">${urgencyStars} Void Severity</span>
+          </div>
+
+          <h4 class="problem-title" style="color: #fff; font-size: 15px; margin: 10px 0 6px;">${escapeHtml(v.title)}</h4>
+          
+          <div style="background: rgba(0,0,0,0.25); border-left: 2px solid var(--accent-orange); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: var(--text-main);">
+            <strong style="color: var(--accent-orange);">⚠️ Root Cause / Barrier:</strong> ${escapeHtml(v.problem_summary || v.content.slice(0, 140))}
+          </div>
+
+          <p class="problem-content" style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${escapeHtml(v.content ? v.content.slice(0, 180) + "..." : "")}</p>
+
+          <div style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 4px; padding: 8px 12px; margin: 10px 0; font-size: 11px;">
+            <div style="color: var(--text-dim); font-weight: 700;">CONSUMER WORKAROUND:</div>
+            <div style="color: var(--text-main); margin-top: 2px;">${escapeHtml(v.solution_found || "No formal domestic channel; gray-market couriers or travel mule.")}</div>
+          </div>
+
+          <div class="problem-meta-row">
+            <span class="meta-pill">📍 ${escapeHtml(v.city)}</span>
+            <span class="meta-pill">🔗 ${escapeHtml(v.source_platform)}</span>
+          </div>
+        </div>
+
+        ${v.venture_concept ? `
+          <div class="problem-opp-box" style="margin-top: 12px; border-color: rgba(0, 191, 255, 0.3);">
+            <div class="problem-opp-title" style="color: var(--accent-cyan);">💡 Import Arbitrage & Venture Concept</div>
+            <div style="font-size: 12px;"><strong>${escapeHtml(v.venture_concept)}</strong>: ${escapeHtml(v.solution_summary || "")}</div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join("");
 }

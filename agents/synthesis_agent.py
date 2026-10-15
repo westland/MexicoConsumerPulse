@@ -234,6 +234,10 @@ class MexicanSynthesisAgent:
             "Expat & Relocation Friction": {
                 "venture_concept": "Bilingual Soft-Landing & Financial Onboarding Engine",
                 "solution_summary": f"All-in-one expat relocation stack managing Mexican bank accounts without RFC, local SIMs, legal lease reviews, and verified bilingual contractors in {city}."
+            },
+            "Product Voids & Import Wishlist": {
+                "venture_concept": "Cross-Border Pre-Cleared DTC Retail Arbitrage & Micro-Warehousing",
+                "solution_summary": f"A specialized e-commerce logistics platform importing high-demand US, China, and EU consumer products into Mexico with pre-cleared COFEPRIS/SAT duties, local Mercado Libre/Amazon MX fulfillment, and 48-hour delivery across {city}."
             }
         }
         
@@ -259,6 +263,10 @@ class MexicanSynthesisAgent:
                 "Expat & Relocation Friction": {
                     "venture_concept": "Yucatán Coastal Fideicomiso & Bilingual Soft-Landing Stack",
                     "solution_summary": "Turnkey legal bank trust (fideicomiso) structuring for foreign buyers in Progreso and Mérida, bilingual escrow, and utility onboarding."
+                },
+                "Product Voids & Import Wishlist": {
+                    "venture_concept": "Port of Progreso Maritime Consolidation for US & European Specialty Goods",
+                    "solution_summary": "A direct maritime container logistics service linking Florida/Gulf ports directly to Puerto Progreso, bypassing CDMX customs bottlenecks to supply Mérida expats and locals with missing home goods, appliances, and specialty foods."
                 }
             }
             if category in yucatan_hypotheses:

@@ -29,11 +29,12 @@ def main():
     parser.add_argument("--fb-login", action="store_true", help="Launch interactive headed browser for Facebook login / 2FA session capture")
     parser.add_argument("--report", action="store_true", help="Generate Daily Intelligence Report only")
     parser.add_argument("--export", action="store_true", help="Export SQLite database to CSV and JSON")
+    parser.add_argument("--web", action="store_true", help="Launch FastAPI Web Dashboard server on http://localhost:8000")
     
     args = parser.parse_args()
 
     # Default to --all if no specific arguments provided
-    if not any([args.all, args.reddit, args.twitter, args.facebook, args.fb_login, args.report, args.export]):
+    if not any([args.all, args.reddit, args.twitter, args.facebook, args.whatsapp, args.fb_login, args.report, args.export, args.web]):
         args.all = True
 
     print("=" * 70)
@@ -42,6 +43,13 @@ def main():
     print("=" * 70)
 
     db = DatasetManager()
+
+    # 0. Launch Web Server
+    if args.web:
+        import uvicorn
+        print("\n[Web Server] Launching MexConsumerPulse Dashboard on http://localhost:8000 ...")
+        uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+        return
 
     # 1. Interactive Facebook Login
     if args.fb_login:
