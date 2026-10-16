@@ -108,6 +108,10 @@
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
         <span id="tab-text-mercadolibre">🛒 Mercado Libre México</span>
       </button>
+      <button class="tab-btn" id="tab-btn-gemini" data-tab="tab-gemini" style="border: 1px solid rgba(0, 230, 153, 0.4);">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <span id="tab-text-gemini">✨ Copiloto IA (Gemini 3.5 / Flash-Lite)</span>
+      </button>
       <button class="tab-btn" id="tab-btn-agents" data-tab="tab-agents">
         <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
         <span id="tab-text-agents">🤖 Operaciones y Reporte de Agentes</span>
@@ -757,6 +761,86 @@ Ejemplo:
         </div>
       </div>
 
+    </section>
+
+    <!-- TAB 7: GEMINI COPILOT & CONVERSATIONAL SYNTHESIS -->
+    <section class="tab-content" id="tab-gemini">
+      <div class="glass-panel" style="padding: 24px; margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+              <span class="badge badge-success" style="background: rgba(0, 230, 153, 0.2); color: #00e699; border: 1px solid rgba(0,230,153,0.4);">
+                ✨ Google Gemini 3.5 / Flash-Lite Grounded LLM
+              </span>
+              <span class="badge badge-cyan" id="gemini-status-badge">⚡ Modelo: gemini-2.5-flash-lite</span>
+            </div>
+            <h2 style="font-size: 22px; font-weight: 800; color: #fff; margin: 4px 0;" id="gemini-header-title">
+              Copiloto Conversacional de Inteligencia de Mercado
+            </h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;" id="gemini-header-sub">
+              Pregunta cualquier duda sobre fricciones de consumidores en México, productos en auge de Mercado Libre, o solicita hipótesis de negocio en tiempo real.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" id="btn-clear-gemini-chat" onclick="clearGeminiChat()">
+              🗑️ Limpiar Chat
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick Prompt Suggestions -->
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08);">
+          <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">
+            💡 Sugerencias Rápidas de Investigación:
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button class="filter-pill" onclick="sendGeminiPrompt('¿Cuáles son las 3 peores quejas sobre filtros de agua y sarro en Mérida?')">
+              💧 Quejas de Sarro en Mérida
+            </button>
+            <button class="filter-pill" onclick="sendGeminiPrompt('¿Qué productos de Mercado Libre tienen mayores ventas por apagones de CFE?')">
+              ⚡ Apagones de CFE & Mercado Libre
+            </button>
+            <button class="filter-pill" onclick="sendGeminiPrompt('Genera una hipótesis de startup para evitar el desbordamiento de deshumidificadores en costas mexicanas.')">
+              💼 Startup de Deshumidificadores
+            </button>
+            <button class="filter-pill" onclick="sendGeminiPrompt('¿Cuáles son los productos de EE.UU. no disponibles en México con mayor oportunidad de arbitraje?')">
+              🇺🇸 Oportunidades de Arbitraje USA
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Container -->
+      <div class="glass-panel" style="padding: 20px; display: flex; flex-direction: column; min-height: 480px; max-height: 650px;">
+        <div id="gemini-chat-feed" style="flex: 1; overflow-y: auto; padding-right: 8px; display: flex; flex-direction: column; gap: 16px; margin-bottom: 16px;">
+          <!-- Welcome message -->
+          <div class="chat-msg chat-assistant" style="display: flex; gap: 12px; align-items: flex-start;">
+            <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #00e699, #00b4d8); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+              ✨
+            </div>
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 14px 18px; max-width: 85%; font-size: 14px; line-height: 1.6; color: var(--text-main);">
+              <strong>¡Hola! Soy tu Copiloto de Inteligencia de Mercado potenciado por Google Gemini.</strong><br><br>
+              Tengo acceso en tiempo real a la base de datos de <strong>MexConsumerPulse</strong>:
+              <ul style="margin: 8px 0; padding-left: 20px;">
+                <li>🔥 Ventas en alza y productos calientes en <strong>Mercado Libre México</strong>.</li>
+                <li>⚠️ Reseñas negativas (1 a 3 ⭐) por fallas locales (sarro en Yucatán, variaciones de voltaje CFE, humedad).</li>
+                <li>🎁 Vacíos comerciales transfronterizos y productos deseados de EE.UU./Asia.</li>
+                <li>🏙️ Reportes urbanos por colonia en CDMX, Mérida, GDL y Monterrey.</li>
+              </ul>
+              ¿Qué te gustaría analizar o qué hipótesis de negocio quieres estructurar hoy?
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Bar -->
+        <div style="display: flex; gap: 10px; align-items: flex-end; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08);">
+          <textarea id="gemini-input" rows="2" placeholder="Escribe tu pregunta sobre el mercado mexicano, infraestructura o productos..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; color: #fff; font-family: inherit; font-size: 14px; resize: none; outline: none;"></textarea>
+          <button class="btn btn-primary" id="btn-send-gemini" onclick="handleGeminiSend()" style="height: 52px; padding: 0 24px; display: flex; align-items: center; gap: 8px;">
+            <span>Enviar</span>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </div>
+      </div>
     </section>
 
   </main>

@@ -35,6 +35,8 @@ app.add_middleware(
 
 from agents.whatsapp_agent import WhatsAppVecinosAgent
 from agents.mercadolibre_agent import MercadoLibreAgent
+from agents.gemini_agent import gemini_copilot
+from pydantic import BaseModel
 
 db = DatasetManager()
 report_gen = DailyReportGenerator()
@@ -422,6 +424,66 @@ def download_export(file_type: str):
         return FileResponse(exports["json_path"], media_type="application/json", filename="mexico_consumer_problems_latest.json")
 
     raise HTTPException(status_code=404, detail="Export file not found.")
+
+class GeminiChatRequest(BaseModel):
+    message: str
+    history: Optional[list] = None
+
+class GeminiSynthesizeRequest(BaseModel):
+    problem_title: str
+    problem_content: str
+    city: str
+    category: str
+
+@app.get("/api/gemini/status")
+def gemini_status():
+    return {
+        "configured": gemini_copilot.is_configured(),
+        "preferred_model": gemini_copilot.preferred_model,
+        "available_models": gemini_copilot.CANDIDATE_MODELS
+    }
+
+@app.post("/api/gemini/chat")
+def gemini_chat(payload: GeminiChatRequest):
+    if not payload.message:
+        raise HTTPException(status_code=400, detail="Message cannot be empty.")
+    
+    # Gather live database context for grounding
+    try:
+        hot_prods = db.get_mercadolibre_hot_products(limit=5)
+    except Exception:
+        hot_prods = []
+    try:
+        problem_prods = db.get_mercadolibre_problem_products(limit=5)
+    except Exception:
+        problem_prods = []
+    try:
+        voids = db.get_product_voids(limit=5)
+    except Exception:
+        voids = []
+    
+    context = {
+        "hot_products": hot_prods,
+        "problem_products": problem_prods,
+        "product_voids": voids
+    }
+    
+    res = gemini_copilot.chat_with_copilot(
+        message=payload.message,
+        history=payload.history,
+        context_data=context
+    )
+    return res
+
+@app.post("/api/gemini/synthesize")
+def gemini_synthesize(payload: GeminiSynthesizeRequest):
+    res = gemini_copilot.deep_venture_synthesis(
+        problem_title=payload.problem_title,
+        problem_content=payload.problem_content,
+        city=payload.city,
+        category=payload.category
+    )
+    return res
 
 if __name__ == "__main__":
     import uvicorn

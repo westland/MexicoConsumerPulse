@@ -1174,3 +1174,143 @@ function escapeHtml(str) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+// -------------------------------------------------------------
+// 12. Google Gemini Copilot & Conversational Research Assistant
+// -------------------------------------------------------------
+let geminiChatHistory = [];
+
+function sendGeminiPrompt(text) {
+  const input = document.getElementById("gemini-input");
+  if (input) {
+    input.value = text;
+    handleGeminiSend();
+  }
+}
+
+function clearGeminiChat() {
+  geminiChatHistory = [];
+  const feed = document.getElementById("gemini-chat-feed");
+  if (feed) {
+    feed.innerHTML = `
+      <div class="chat-msg chat-assistant" style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #00e699, #00b4d8); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+          ✨
+        </div>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 14px 18px; max-width: 85%; font-size: 14px; line-height: 1.6; color: var(--text-main);">
+          <strong>¡Chat reiniciado!</strong><br>
+          ¿Qué tema de consumo mexicano o producto de Mercado Libre te gustaría investigar ahora?
+        </div>
+      </div>
+    `;
+  }
+}
+
+async function handleGeminiSend() {
+  const input = document.getElementById("gemini-input");
+  const feed = document.getElementById("gemini-chat-feed");
+  const btn = document.getElementById("btn-send-gemini");
+  if (!input || !feed) return;
+
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  // Append user message
+  const userMsgId = "msg-" + Date.now();
+  feed.innerHTML += `
+    <div class="chat-msg chat-user" id="${userMsgId}" style="display: flex; gap: 12px; justify-content: flex-end; align-items: flex-start;">
+      <div style="background: rgba(0, 230, 153, 0.15); border: 1px solid rgba(0, 230, 153, 0.4); border-radius: var(--radius-md); padding: 12px 18px; max-width: 80%; font-size: 14px; line-height: 1.5; color: #fff;">
+        ${escapeHtml(msg).replace(/\n/g, '<br>')}
+      </div>
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">
+        👤
+      </div>
+    </div>
+  `;
+
+  input.value = "";
+  feed.scrollTop = feed.scrollHeight;
+
+  // Append loading indicator
+  const loadingId = "loading-" + Date.now();
+  feed.innerHTML += `
+    <div class="chat-msg chat-assistant" id="${loadingId}" style="display: flex; gap: 12px; align-items: flex-start;">
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #00e699, #00b4d8); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+        ✨
+      </div>
+      <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 14px 18px; font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
+        <span>Consultando a Google Gemini con datos en tiempo real de México...</span>
+      </div>
+    </div>
+  `;
+  feed.scrollTop = feed.scrollHeight;
+
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch("/api/gemini/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: msg,
+        history: geminiChatHistory
+      })
+    });
+
+    const data = await res.json();
+    const loadingElem = document.getElementById(loadingId);
+    if (loadingElem) loadingElem.remove();
+
+    const reply = data.reply || "No response received.";
+    const formattedReply = parseMarkdownToHtml(reply);
+
+    feed.innerHTML += `
+      <div class="chat-msg chat-assistant" style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #00e699, #00b4d8); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+          ✨
+        </div>
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 16px 20px; max-width: 85%; font-size: 14px; line-height: 1.6; color: var(--text-main);">
+          ${formattedReply}
+          ${data.model_used ? `<div style="margin-top: 10px; font-size: 11px; color: var(--accent-cyan); font-family: var(--font-mono);">⚡ ${data.model_used}</div>` : ''}
+        </div>
+      </div>
+    `;
+
+    geminiChatHistory.push({ role: "user", parts: [msg] });
+    geminiChatHistory.push({ role: "model", parts: [reply] });
+
+  } catch (err) {
+    console.error("Gemini request error:", err);
+    const loadingElem = document.getElementById(loadingId);
+    if (loadingElem) loadingElem.remove();
+
+    feed.innerHTML += `
+      <div class="chat-msg chat-assistant" style="display: flex; gap: 12px; align-items: flex-start;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: #ff4d6d; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+          ⚠️
+        </div>
+        <div style="background: rgba(255, 77, 109, 0.1); border: 1px solid rgba(255, 77, 109, 0.3); border-radius: var(--radius-md); padding: 14px 18px; color: #ffb3c1; font-size: 13px;">
+          Error al conectar con el servidor: ${err.message}
+        </div>
+      </div>
+    `;
+  } finally {
+    if (btn) btn.disabled = false;
+    feed.scrollTop = feed.scrollHeight;
+  }
+}
+
+// Enter key submit on Gemini textarea
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("gemini-input");
+  if (input) {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleGeminiSend();
+      }
+    });
+  }
+});
+
