@@ -42,5 +42,10 @@ Nuveen*
 *.pdf
 *.png
 
+# Secrets and Environment Variables
+.env
+*.env
+.env.*
+
 # Hetzner temporary scratch
 hetzner/askpass*
