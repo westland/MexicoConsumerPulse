@@ -853,15 +853,14 @@ Ejemplo:
         <button class="modal-close" id="btn-close-modal">&times;</button>
       </div>
       <div class="modal-body">
-        <p>Because Facebook uses high-security bot detection and gated screening questions for neighborhood groups (*"Vecinos de..."*), you can launch an interactive browser window to log in once:</p>
+        <p>Because Facebook uses high-security bot detection and gated screening questions for neighborhood groups (<em>"Vecinos de..."</em>), you can log in once to capture and persist your session cookies:</p>
         <ol class="setup-steps">
-          <li>Click <strong>"Launch Headed Login Browser"</strong> below.</li>
-          <li>A browser window will open. Enter your Facebook credentials and complete 2FA.</li>
-          <li>Answer any group gatekeeper questions (e.g. <em>¿En qué calle vives?</em>).</li>
-          <li>Once logged in, the agent automatically saves your session tokens to <code>data/auth_state/facebook_state.json</code>.</li>
+          <li><strong>Option A (1-Click Windows):</strong> Double-click <strong style="color: var(--accent-cyan);"><code>LOGIN_FB_SESSION.bat</code></strong> on your Desktop.</li>
+          <li><strong>Option B (Terminal / CLI):</strong> Run <strong style="color: var(--accent-green);"><code>python run.py --fb-login</code></strong> in your terminal.</li>
+          <li><strong>Option C (Local Web Server):</strong> Click <strong>"Launch Headed Login Browser"</strong> below if running on <code>localhost:8000</code>.</li>
         </ol>
-        <div class="terminal-box">
-          <code>CLI Alternative: python run.py --fb-login</code>
+        <div style="background: rgba(0, 230, 153, 0.08); border: 1px solid rgba(0, 230, 153, 0.25); border-radius: var(--radius-sm); padding: 12px; font-size: 12px; margin-top: 10px; color: var(--text-main);">
+          💡 <em>Note: If you are browsing on the cloud production server (<strong style="color: #fff;">pulse-mexico.com</strong>), cloud servers cannot open GUI windows on your personal desktop. Use Option A or B on your computer to log in.</em>
         </div>
       </div>
       <div class="modal-footer">

@@ -74,18 +74,32 @@ Located in the top header bar across all tabs:
 
 ### Facebook Session & 2FA Setup (`Sesión FB`)
 * **Button:** `Sesión FB` / `FB Session` in the header or in the **Facebook Groups Browser Agent** card.
-* **Why it is needed:** Mexican neighborhood groups (*"Vecinos Condesa"*, *"Vecinos Roma Norte"*, *"Expats in Mérida"*, *"Lady Multitask"*) are closed or private, protected by anti-bot verification and gatekeeper screening questions (e.g., *"¿En qué calle o colonia vives?"*). Headless scrapers get blocked.
-* **How to use it:**
-  1. Click **`Sesión FB`**. A modal dialog appears.
-  2. Click **`Launch Headed Login Browser`** (or execute `python run.py --fb-login` in terminal).
-  3. An automated Google Chrome / Chromium window will pop open on your desktop via Playwright.
-  4. Manually type your Facebook username, password, and approve your 2FA authentication prompt (SMS or authenticator app).
-  5. Navigate to your target private groups and answer any gatekeeper screening questions if prompted.
-  6. **You do not need to save anything manually.** The agent watches the browser URL; as soon as it detects the Facebook feed (`/home` or `/groups`), it extracts your encrypted session cookies and writes them to:
+* **Why it is needed:** Mexican neighborhood groups (*"Vecinos Condesa"*, *"Vecinos Roma Norte"*, *"Expats in Mérida"*, *"Lady Multitask"*) are closed or private, protected by anti-bot verification and gatekeeper screening questions (e.g., *"¿En qué calle o colonia vives?"*). Headless scrapers get blocked without saved cookies.
+* **How to open the login window (3 Ways):**
+  1. **Option 1 (1-Click Desktop Launcher - Recommended for Windows):**
+     * Double-click [**`LOGIN_FB_SESSION.bat`**](file:///c:/Users/chris/Desktop/LOGIN_FB_SESSION.bat) located directly on your Windows Desktop (or in the project folder).
+     * An automated Chromium browser window pops open instantly on your desktop.
+  2. **Option 2 (Terminal / CLI):**
+     * Open your command prompt / terminal and run:
+       ```bash
+       python run.py --fb-login
+       ```
+  3. **Option 3 (From Local Web Server):**
+     * If you are running the app locally on your machine at `http://localhost:8000/`:
+     * Click **`Sesión FB`** in the header.
+     * Click **`Launch Headed Login Browser`**. The local server will launch the window on your screen.
+* **⚠️ Important Note Regarding Cloud Production (`pulse-mexico.com`):**
+  * When browsing the live cloud website at `https://pulse-mexico.com/`, the server runs on a remote Linux cloud VPS. Remote cloud servers cannot physically render or project desktop GUI windows onto your home computer screen.
+  * Therefore, whenever you need to log in to Facebook, use **Option 1** (`LOGIN_FB_SESSION.bat`) or **Option 2** on your computer.
+* **What to do once the browser window opens:**
+  1. Manually type your Facebook username, password, and approve your 2FA prompt.
+  2. Answer any gatekeeper screening questions in your neighborhood groups.
+  3. **Automatic Session Capture:** As soon as the agent detects your Facebook feed or groups page, it automatically extracts your encrypted session tokens and saves them to:
      ```text
      data/auth_state/facebook_state.json
      ```
-  7. Subsequent automated runs will now browse Facebook in headless mode using this session state without triggering bot verification.
+  4. Subsequent automated runs will now browse Facebook in headless mode using this session state without triggering bot verification.
+
 
 ### Trigger Full Swarm (`Ejecutar Enjambre`)
 * **Button:** Green `Ejecutar Enjambre` / `Run Agent Swarm` button.

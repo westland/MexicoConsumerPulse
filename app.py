@@ -405,6 +405,43 @@ def trigger_agent(agent_name: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(_run_agent_task, agent_name)
     return {"status": "accepted", "agent": agent_name, "message": f"Agent run '{agent_name}' triggered in background."}
 
+@app.post("/api/agents/login/{service}")
+def launch_interactive_login(service: str):
+    import os
+    if service not in ["facebook", "mercadolibre"]:
+        raise HTTPException(status_code=400, detail="Invalid service. Choose 'facebook' or 'mercadolibre'.")
+
+    # Detect if running in cloud VPS / Docker container without a local GUI display
+    is_headless_cloud = (sys.platform != "win32" and not os.environ.get("DISPLAY"))
+    if is_headless_cloud:
+        cmd_name = "--fb-login" if service == "facebook" else "--ml-login"
+        bat_name = "LOGIN_FB_SESSION.bat" if service == "facebook" else "LOGIN_ML_SESSION.bat"
+        return {
+            "status": "cloud_notice",
+            "service": service,
+            "message": (
+                f"Estás navegando en el servidor en la nube (pulse-mexico.com). "
+                f"Un servidor remoto en Linux no puede abrir una ventana física de Chrome en el monitor de tu computadora. "
+                f"Para iniciar sesión y capturar cookies en tu máquina: ejecuta 'python run.py {cmd_name}' en tu terminal "
+                f"o haz doble clic en '{bat_name}' en tu escritorio."
+            ),
+            "command": f"python run.py {cmd_name}",
+            "bat_file": bat_name
+        }
+
+    # Running locally on user's machine (Windows/Mac/Linux with GUI)
+    flag = "--fb-login" if service == "facebook" else "--ml-login"
+    try:
+        proc = subprocess.Popen([sys.executable, str(BASE_DIR / "run.py"), flag])
+        return {
+            "status": "launched",
+            "service": service,
+            "message": f"Ventana de Google Chrome / Chromium abierta exitosamente en tu escritorio para {service.capitalize()}.",
+            "pid": proc.pid
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to launch headed browser: {e}")
+
 @app.get("/api/exports/{file_type}")
 def download_export(file_type: str):
     if file_type == "csv":

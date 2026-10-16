@@ -364,11 +364,31 @@ function initModals() {
 
   if (btnLaunch) {
     btnLaunch.addEventListener("click", () => {
-      showToast(currentLang === "es" ? "Lanzando navegador para inicio de sesión en FB..." : "Launching browser for Facebook login...");
-      closeModal();
-      fetch("/api/agents/run/facebook", { method: "POST" })
-        .then(() => showToast(currentLang === "es" ? "Navegador de Facebook iniciado." : "Facebook browser process started."))
-        .catch(err => showToast("Error: " + err.message));
+      showToast(currentLang === "es" ? "Solicitando inicio de sesión interactivo..." : "Requesting interactive login session...");
+      btnLaunch.disabled = true;
+
+      fetch("/api/agents/login/facebook", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+          btnLaunch.disabled = false;
+          if (data.status === "cloud_notice") {
+            // User is browsing on remote server (pulse-mexico.com)
+            alert(
+              "⚠️ AVISO DE SERVIDOR EN LA NUBE:\n\n" +
+              data.message + "\n\n" +
+              "👉 Comando: " + data.command + "\n" +
+              "👉 O archivo: " + data.bat_file
+            );
+          } else {
+            // Local machine: browser popped open!
+            showToast(currentLang === "es" ? "¡Ventana de Chromium abierta en tu escritorio! Inicia sesión para guardar cookies." : "Chromium window opened on your desktop! Log in to save session cookies.");
+            closeModal();
+          }
+        })
+        .catch(err => {
+          btnLaunch.disabled = false;
+          showToast("Error: " + err.message);
+        });
     });
   }
 }
