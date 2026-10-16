@@ -36,16 +36,17 @@ class GeminiCopilotAgent:
     """
 
     CANDIDATE_MODELS = [
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash",
+        "gemini-3.1-flash-lite",
+        "gemini-3-flash-preview",
         "gemini-2.5-flash-lite",
-        "gemini-2.0-flash-lite",
         "gemini-2.5-flash",
-        "gemini-1.5-flash",
-        "gemini-2.0-flash"
     ]
 
     def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY", "").strip()
-        self.preferred_model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite").strip()
+        self.preferred_model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
         self.client = None
         self._init_client()
 
