@@ -16,6 +16,7 @@ from agents.reddit_agent import RedditScraperAgent
 from agents.twitter_agent import TwitterScraperAgent
 from agents.facebook_agent import FacebookBrowserAgent
 from agents.whatsapp_agent import WhatsAppVecinosAgent
+from agents.mercadolibre_agent import MercadoLibreAgent
 from agents.dataset_manager import DatasetManager
 from reports.report_generator import DailyReportGenerator
 
@@ -26,6 +27,7 @@ def main():
     parser.add_argument("--twitter", action="store_true", help="Run Twitter/X Complaint Agent")
     parser.add_argument("--facebook", action="store_true", help="Run Facebook Groups Browser Agent")
     parser.add_argument("--whatsapp", action="store_true", help="Parse WhatsApp 'Chat de Vecinos' community stream")
+    parser.add_argument("--mercadolibre", action="store_true", help="Scrape product reviews and details from Mercado Libre México (mercadolibre.com.mx)")
     parser.add_argument("--fb-login", action="store_true", help="Launch interactive headed browser for Facebook login / 2FA session capture")
     parser.add_argument("--report", action="store_true", help="Generate Daily Intelligence Report only")
     parser.add_argument("--export", action="store_true", help="Export SQLite database to CSV and JSON")
@@ -34,7 +36,7 @@ def main():
     args = parser.parse_args()
 
     # Default to --all if no specific arguments provided
-    if not any([args.all, args.reddit, args.twitter, args.facebook, args.whatsapp, args.fb_login, args.report, args.export, args.web]):
+    if not any([args.all, args.reddit, args.twitter, args.facebook, args.whatsapp, args.mercadolibre, args.fb_login, args.report, args.export, args.web]):
         args.all = True
 
     print("=" * 70)
@@ -89,7 +91,7 @@ def main():
 
     # 5. WhatsApp Vecinos Agent
     if args.all or args.whatsapp:
-        print("\n[Stage 4/5] Ingesting WhatsApp 'Chat de Vecinos' Stream...")
+        print("\n[Stage 4/6] Ingesting WhatsApp 'Chat de Vecinos' Stream...")
         try:
             wa_agent = WhatsAppVecinosAgent()
             wa_res = wa_agent.import_sample_condesa_chat()
@@ -97,9 +99,19 @@ def main():
         except Exception as e:
             print(f" [Error] WhatsApp Agent failed: {e}")
 
-    # 6. Daily Report Generation
+    # 6. Mercado Libre Mexico Product Reviews & Details Scraper Agent
+    if args.all or args.mercadolibre:
+        print("\n[Stage 5/6] Invoking Mercado Libre México Product Reviews & Details Agent...")
+        try:
+            ml_agent = MercadoLibreAgent()
+            ml_res = agent_run = ml_agent.run()
+            print(f" -> Completed: Harvested {ml_res['total_collected']} products and reviews from https://www.mercadolibre.com.mx/")
+        except Exception as e:
+            print(f" [Error] Mercado Libre Agent failed: {e}")
+
+    # 7. Daily Report Generation
     if args.all or args.report:
-        print("\n[Stage 5/5] Synthesizing Daily Bullet-Pointed Intelligence Report...")
+        print("\n[Stage 6/6] Synthesizing Daily Bullet-Pointed Intelligence Report...")
         try:
             report_gen = DailyReportGenerator()
             report_res = report_gen.generate_report()

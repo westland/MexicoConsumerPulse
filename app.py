@@ -34,10 +34,12 @@ app.add_middleware(
 )
 
 from agents.whatsapp_agent import WhatsAppVecinosAgent
+from agents.mercadolibre_agent import MercadoLibreAgent
 
 db = DatasetManager()
 report_gen = DailyReportGenerator()
 whatsapp_agent = WhatsAppVecinosAgent()
+ml_agent = MercadoLibreAgent()
 
 @app.post("/api/whatsapp/import")
 async def import_whatsapp_chat(payload: dict):
@@ -176,14 +178,29 @@ def get_agents_activity():
                     "Trader Joe's gourmet seasonings commanding 400% markup on Instagram grey market",
                     "COFEPRIS OTC classification restrictions blocking bulk generic allergy and melatonin products"
                 ]
+            },
+            {
+                "id": "mercadolibre",
+                "name": "Mercado Libre México Product & Review Scraper",
+                "icon": "🛒",
+                "status": "Active • Monitoring México",
+                "target": "https://www.mercadolibre.com.mx/ (Only México MLM Items)",
+                "records_harvested": len(ml_agent.get_products()),
+                "action_summary": "Scrapes product details, MXN pricing, and verified Mexican customer reviews/complaints on regional product failures.",
+                "key_findings": [
+                    "Water purifiers failing within 2 weeks due to Mérida & Yucatan limestone sarro",
+                    "CFE power surges burning refrigerator compressor electronics in Monterrey and GDL",
+                    "Tropical humidity (90%+) overwhelming standard 2L dehumidifier tanks in coastal Mexico",
+                    "Compact countertop dishwashers sold at 100% markup over US prices due to domestic big-box omission"
+                ]
             }
         ],
         "hetzner_deployment_status": {
             "target": "pulse-mexico.com (89.167.22.10)",
-            "state": "Live & SSL Secured",
+            "state": "Live & Dual-Language Ready",
             "script": "C:\\Users\\chris\\Desktop\\Market Research Mexico\\hetzner",
-            "containers": ["mexconsumerpulse_web (port 8080->8000)", "Nginx reverse proxy (443 Let's Encrypt)"],
-            "notes": "Live production environment serving https://pulse-mexico.com/"
+            "containers": ["mexconsumerpulse_web (port 8080->8000)", "Nginx reverse proxy (443 Let's Encrypt & 8000)"],
+            "notes": "Live production environment serving English on https://pulse-mexico.com/ and Spanish on :8000"
         }
     }
 
@@ -341,6 +358,10 @@ def list_reports():
         })
     return reports
 
+@app.get("/api/mercadolibre/products")
+def get_mercadolibre_products(limit: int = Query(50, ge=1, le=100)):
+    return ml_agent.get_products(limit=limit)
+
 def _run_agent_task(agent_name: str):
     cmd = [sys.executable, str(BASE_DIR / "run.py")]
     if agent_name == "all":
@@ -351,6 +372,10 @@ def _run_agent_task(agent_name: str):
         cmd.append("--twitter")
     elif agent_name == "facebook":
         cmd.append("--facebook")
+    elif agent_name == "whatsapp":
+        cmd.append("--whatsapp")
+    elif agent_name == "mercadolibre":
+        cmd.append("--mercadolibre")
     elif agent_name == "report":
         cmd.append("--report")
 
@@ -358,7 +383,7 @@ def _run_agent_task(agent_name: str):
 
 @app.post("/api/agents/run/{agent_name}")
 def trigger_agent(agent_name: str, background_tasks: BackgroundTasks):
-    valid_agents = ["all", "reddit", "twitter", "facebook", "report"]
+    valid_agents = ["all", "reddit", "twitter", "facebook", "whatsapp", "mercadolibre", "report"]
     if agent_name not in valid_agents:
         raise HTTPException(status_code=400, detail=f"Invalid agent. Choose from: {valid_agents}")
     

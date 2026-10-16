@@ -161,24 +161,44 @@ python run.py --export
 
 ---
 
-## 5. Bilingual (Spanish / English) Architecture & Status (Ready to Resume)
+## 5. Bilingual (Spanish / English) Architecture & Status (100% Completed)
 
-* **Goal:** Provide a Spanish language version by default on port 8000 (`http://localhost:8000/`) and on production (`https://pulse-mexico.com/`), with an interactive header toggle `[🇲🇽 ES | 🇺🇸 EN]` to switch seamlessly between English and Spanish.
-* **Work Completed:**
-  1. **Dual-Language Report Engine (`reports/report_generator.py`):**
-     * Fully implemented bilingual report generation supporting `lang="es"` (default) and `lang="en"`.
-     * Generates executive summaries, bullet takeaways, and full markdown briefings in both Spanish and English.
-     * Pre-generated and cached 10 report variants (National, Mérida & Yucatán, CDMX, GDL, MTY in both `es` and `en`) into `reports/daily_reports/` and `data/mexico_consumer_insights.db`.
-  2. **API Layer (`app.py`):**
-     * Updated `get_latest_report(region: str = "All", lang: str = "es")` to accept `lang` parameter and return the corresponding Spanish or English daily report.
-     * Supported URL endpoints: `/`, `/es`, and `/en`.
-  3. **Design & Switcher Styles (`frontend/style.css`):**
-     * Implemented `.lang-switch-group`, `.lang-btn`, and `.lang-btn.active` pill toggles in the header actions bar with glow effects.
-  4. **Frontend Structure & Spanish Defaults (`frontend/index.html`):**
-     * Inserted the `<div class="lang-switch-group">` with `#btn-lang-es` and `#btn-lang-en` buttons.
-     * Updated UI text, tab navigation, KPI cards, filter menus, and section headers to Spanish defaults with explicit element IDs for dynamic switching.
-* **Next Steps to Complete Translation Later:**
-  * In `frontend/app.js`: Connect the `setLanguage(lang)` function with the full `TRANSLATIONS` dictionary to toggle all element text dynamically and re-fetch `/api/reports/latest?region=${region}&lang=${lang}` when the user clicks the switch.
-  * Push updated files to Hetzner VPS (`89.167.22.10`) and restart container.
-  * Commit and push new release to GitHub repo `westland/MexicoConsumerPulse`.
+* **Default Spanish Experience:** Port 8000 (`http://localhost:8000/`) and root `/` default to Mexican Spanish (`es-MX`), featuring Spanish KPI labels, navigation tabs, filter menus, and reports.
+* **Interactive Switcher `[🇲🇽 ES | 🇺🇸 EN]`:** Live in the header actions bar. Toggles between Spanish and English without page reload.
+* **URL Routing Support:** `/`, `/es`, and `/en` endpoints served via FastAPI and mirrored with client-side history state.
+* **Persistent Preferences:** Selected language saved to browser `localStorage` (`mex_pulse_lang`).
+* **Dual-Language Report Engine (`reports/report_generator.py`):**
+  * Synthesizes and publishes 10 report variations (National, Mérida & Yucatán, CDMX, GDL, MTY in both `es` and `en`).
+  * REST endpoint `GET /api/reports/latest?region=${region}&lang=${lang}` dynamically delivers Spanish or English markdown briefings.
+* **Frontend Translation Layer (`frontend/app.js`):**
+  * Comprehensive `TRANSLATIONS` dictionary covering all 7 tabs, KPI cards, modals, filter menus, and action buttons.
+  * Dynamically re-renders Problem Explorer, Product Voids, and Mercado Libre intelligence in the user's selected language.
+
+---
+
+## 6. Mercado Libre México (mercadolibre.com.mx) Autonomous Agent & Reporting (100% Completed)
+
+* **Dedicated Autonomous Agent (`agents/mercadolibre_agent.py`):**
+  * Exclusively targets **Mercado Libre México (MLM)** items and verified Mexican consumer reviews.
+  * Collects product specifications, prices in MXN, ratings, seller locations, and Mexican failure modes.
+  * Focuses on acute regional pain points:
+    1. *Water purifiers* clogged in 2 weeks by limestone (*sarro de JAPAY*) in Mérida and Querétaro.
+    2. *Voltage regulators* burning thermal fuses due to CFE summer grid surges in Monterrey and GDL.
+    3. *Dehumidifiers* overflowing 2L tanks under 90%+ tropical humidity in Yucatán coastal homes.
+    4. *Compact countertop dishwashers* sold at 100% markup over US prices due to domestic retail omission.
+    5. *Inverter mini-splits* suffering compressor failure from uncertified installation without vacuum pumps.
+* **Dedicated SQLite Table & API:**
+  * `mercadolibre_products` table persisted in `data/mexico_consumer_insights.db`.
+  * REST endpoint `GET /api/mercadolibre/products` returning structured product intelligence with review JSON arrays.
+  * Background execution trigger: `POST /api/agents/run/mercadolibre` and CLI flag `python run.py --mercadolibre`.
+* **Integrated Reporting (`reports/report_generator.py`):**
+  * Dedicated **Section 7** in daily executive reports:
+    * Spanish: `## 7. Inteligencia de Productos y Reseñas en Mercado Libre México (mercadolibre.com.mx)`
+    * English: `## 7. Mercado Libre Mexico Product Quality & Customer Review Intelligence (mercadolibre.com.mx)`
+  * Includes pricing tables, seller locations, defect analyses, and verbatim buyer complaint callouts.
+* **Dedicated Dashboard Tab (`tab-mercadolibre`):**
+  * Interactive 7th navigation tab `🛒 Mercado Libre México` in [frontend/index.html](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/frontend/index.html).
+  * Real-time metrics bar (Total products, average rating, MXN price range, 100% Mexican defect alerts).
+  * Glassmorphism cards with Mercado Libre yellow accent (`#ffe600`), price tags, seller chips, failure summaries, buyer quotes, and venture opportunity formulations.
+
 

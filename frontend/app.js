@@ -1,29 +1,327 @@
 /**
  * MexConsumerPulse Dashboard JavaScript
- * Handles data fetching, markdown rendering, filtering, and agent triggers.
+ * Handles dual-language switching (ES / EN), data fetching, markdown rendering,
+ * product voids, Mercado Libre México intelligence, and agent swarm triggers.
  */
 
-// State
+// Global State
+let currentLang = "es";
+let currentRegion = "All";
+let currentVoidOrigin = "All";
 let allProblems = [];
 let allProductVoids = [];
+let allMLProducts = [];
 let latestReportData = null;
-let currentVoidOrigin = "All";
 
+// Comprehensive Bilingual Translation Dictionary
+const TRANSLATIONS = {
+  es: {
+    // Header & Brand
+    "tagline": "Enjambre Autónomo de Inteligencia del Consumidor",
+    "swarm-status-text": "Enjambre Listo • Ciclo Diario Activo",
+    "btn-export-csv-text": "Exportar CSV",
+    "btn-fb-session-text": "Sesión FB",
+    "btn-run-swarm-text": "Ejecutar Enjambre",
+
+    // KPI Cards
+    "kpi-label-total": "Problemas Verificados Monitoreados",
+    "kpi-footer-total": "En CDMX, GDL, MTY, Mérida, Nacional",
+    "kpi-label-urgent": "Alertas de Alta Urgencia (4-5)",
+    "kpi-footer-urgent": "Fallas críticas de servicio y legales",
+    "kpi-label-top-cat": "Vector Dominante de Fricción",
+    "kpi-footer-top-cat": "Mayor frecuencia de quejas",
+    "kpi-label-audience": "Proporción Demográfica",
+    "kpi-footer-audience": "Locales vs Extranjeros vs Compartido",
+
+    // Navigation Tabs
+    "tab-text-report": "Informe Diario de Inteligencia",
+    "tab-text-explorer": "Explorador de Problemas y Datos",
+    "tab-text-product-voids": "🎁 \"Ojalá Vendieran Esto\" (Vacíos e Importaciones)",
+    "tab-text-ventures": "Matriz de Oportunidades de Negocio",
+    "tab-text-whatsapp": "Ingesta de WhatsApp Vecinos",
+    "tab-text-mercadolibre": "🛒 Mercado Libre México",
+    "tab-text-agents": "🤖 Operaciones y Reporte de Agentes",
+
+    // Tab 1: Daily Intelligence Report
+    "badge-pill-report": "Informe Ejecutivo Diario",
+    "label-report-region": "Alcance del Informe:",
+    "opt-reg-all": "🇲🇽 Reporte Nacional Multiciudad",
+    "opt-reg-merida": "🌴 Reporte Mérida y Península de Yucatán",
+    "opt-reg-cdmx": "🏙️ Ciudad de México (CDMX)",
+    "opt-reg-gdl": "🌮 Guadalajara (GDL)",
+    "opt-reg-mty": "⛰️ Monterrey (MTY)",
+    "btn-download-md-text": "Descargar Markdown",
+    "report-meta-display": "Sintetizado por el Enjambre Autónomo de Agentes",
+
+    // Tab 2: Explorer
+    "label-filter-city": "Ciudad / Región",
+    "opt-city-all": "Todas las Regiones",
+    "label-filter-cat": "Categoría",
+    "opt-cat-all": "Todas las Categorías",
+    "label-filter-aud": "Población Objetivo",
+    "opt-aud-all": "Todas las Poblaciones",
+    "opt-aud-local": "🇲🇽 Residentes Locales",
+    "opt-aud-expat": "🇺🇸 Expats / Extranjeros",
+    "search-input": "Buscar por colonia, modismo o palabra clave (ej. sarro, SAT, depósito, CFE)...",
+
+    // Tab 3: Product Voids
+    "badge-pill-voids": "Demanda de Importación & Arbitraje",
+    "voids-title-heading": "🎁 Vacíos de Producto: \"Ojalá Vendieran Esto en México\"",
+    "voids-desc-text": "Monitoreo de productos extranjeros disponibles en EE.UU., China, Japón y Europa que los consumidores mexicanos buscan activamente pero no pueden comprar en tiendas locales debido a falta de distribución formal o trabas regulatorias.",
+    "void-filter-label": "Filtrar por Origen:",
+    "void-btn-all": "🌍 Todos los Orígenes",
+    "void-btn-usa": "🇺🇸 Comercio EE. UU.",
+    "void-btn-china": "🇨🇳 Directo de China",
+    "void-btn-japan": "🇯🇵 Japón y Corea",
+    "void-btn-europe": "🇪🇺 Europa",
+    "void-search-input": "Buscar producto no disponible...",
+    "btn-toggle-wish-text": "+ Sugerir Producto Deseado",
+    "wish-panel-title": "✦ Sugiere un Producto que Quisieras que se Vendiera en México",
+    "wish-panel-desc": "Contribuye a la base de investigación. Las sugerencias son procesadas por el Agente de Síntesis para formular hipótesis de mercado.",
+    "label-wish-prod": "Nombre del Producto y Marca",
+    "label-wish-origin": "Disponible en (País de Origen)",
+    "label-wish-city": "Tu Ciudad / Región",
+    "label-wish-desc": "¿Por qué no se vende / Cómo lo consigues actualmente?",
+    "btn-cancel-wish": "Cancelar",
+    "btn-submit-wish": "Enviar al Enjambre de Investigación",
+
+    // Tab 4: Ventures
+    "ventures-title-heading": "💡 Oportunidades Directas de Mercado e Hipótesis de Negocio",
+    "ventures-desc-text": "Estos conceptos de startup y modelos de negocio se sintetizan automáticamente a partir de quejas de alta fricción, vacíos crónicos de servicio y problemas comunitarios en ciudades mexicanas.",
+
+    // Tab 5: WhatsApp
+    "wa-title-heading": "💬 Analizador Comunitario de \"Chat de Vecinos\" de WhatsApp",
+    "wa-desc-text": "El grupo vecinal de WhatsApp es el sensor más rápido en tiempo real para cortes de agua, variaciones de voltaje y fraudes en México. Pega líneas de chat o carga el ejemplo de la Condesa.",
+    "btn-wa-load-sample": "Cargar Chat de Ejemplo",
+    "btn-wa-parse": "Anonimizar e Ingerir Chat",
+    "wa-results-title": "✦ Problemas Comunitarios Extraídos",
+
+    // Tab 6: Mercado Libre México
+    "ml-live-badge": "Solo Mercado Libre México (mercadolibre.com.mx)",
+    "ml-tab-title": "Mercado Libre México: Precios, Calidad y Quejas de Consumidores",
+    "ml-tab-subtitle": "Scraping y análisis exclusivo de mercadolibre.com.mx en artículos con fricción por sarro de agua en Yucatán, sobretensiones de CFE y sobreprecios por falta de inventario minorista formal.",
+    "btn-run-ml-label": "Ejecutar Scraper Mercado Libre",
+    "btn-visit-ml-label": "Visitar MLM ↗",
+    "ml-kpi-tracked-label": "Productos Clave Monitoreados",
+    "ml-kpi-tracked-sub": "Filtros, Reguladores, Deshumidificadores",
+    "ml-kpi-rating-label": "Calificación Promedio",
+    "ml-kpi-rating-sub": "1,950+ Reseñas analizadas en México",
+    "ml-kpi-price-label": "Rango de Precios en MXN",
+    "ml-kpi-price-sub": "Precios en pesos con envío en México",
+    "ml-kpi-friction-label": "Alertas Críticas de Calidad",
+    "ml-kpi-friction-sub": "Sarro kárstico, CFE y clima tropical",
+
+    // Tab 7: Agents
+    "audit-badge-title": "Auditoría Ejecutiva del Enjambre",
+    "audit-badge-agents": "8/8 Agentes Operativos",
+    "audit-title-heading": "Actividad de los Agentes Autónomos",
+    "audit-desc-text": "Auditoría completa de recolección de datos, anonimización de datos personales (PII), análisis de modismos mexicanos y síntesis de oportunidades en urbes mexicanas.",
+    "btn-run-full-swarm-text": "Ejecutar Enjambre Completo",
+    "btn-run-ml-text": "Ejecutar Agente Mercado Libre"
+  },
+  en: {
+    // Header & Brand
+    "tagline": "Autonomous Consumer Intelligence Swarm",
+    "swarm-status-text": "Swarm Operational • Daily Cycle Active",
+    "btn-export-csv-text": "Export CSV",
+    "btn-fb-session-text": "FB Session",
+    "btn-run-swarm-text": "Run Agent Swarm",
+
+    // KPI Cards
+    "kpi-label-total": "Verified Monitored Problems",
+    "kpi-footer-total": "In CDMX, GDL, MTY, Mérida, National",
+    "kpi-label-urgent": "High-Urgency Alerts (4-5)",
+    "kpi-footer-urgent": "Critical service & legal disputes",
+    "kpi-label-top-cat": "Dominant Friction Vector",
+    "kpi-footer-top-cat": "Highest complaint frequency",
+    "kpi-label-audience": "Demographic Ratio",
+    "kpi-footer-audience": "Locals vs Expats vs Shared",
+
+    // Navigation Tabs
+    "tab-text-report": "Daily Intelligence Report",
+    "tab-text-explorer": "Problem & Data Explorer",
+    "tab-text-product-voids": "🎁 \"I Wish They Sold This\" (Voids & Imports)",
+    "tab-text-ventures": "Venture Opportunity Matrix",
+    "tab-text-whatsapp": "WhatsApp Vecinos Ingestion",
+    "tab-text-mercadolibre": "🛒 Mercado Libre Mexico",
+    "tab-text-agents": "🤖 Agent Operations & Reports",
+
+    // Tab 1: Daily Intelligence Report
+    "badge-pill-report": "Executive Daily Report",
+    "label-report-region": "Report Scope:",
+    "opt-reg-all": "🇲🇽 National Multi-City Report",
+    "opt-reg-merida": "🌴 Mérida & Yucatán Peninsula Report",
+    "opt-reg-cdmx": "🏙️ Mexico City (CDMX)",
+    "opt-reg-gdl": "🌮 Guadalajara (GDL)",
+    "opt-reg-mty": "⛰️ Monterrey (MTY)",
+    "btn-download-md-text": "Download Markdown",
+    "report-meta-display": "Synthesized by Autonomous Agent Swarm",
+
+    // Tab 2: Explorer
+    "label-filter-city": "City / Region",
+    "opt-city-all": "All Regions",
+    "label-filter-cat": "Category",
+    "opt-cat-all": "All Categories",
+    "label-filter-aud": "Target Audience",
+    "opt-aud-all": "All Audiences",
+    "opt-aud-local": "🇲🇽 Local Residents",
+    "opt-aud-expat": "🇺🇸 Expats / Foreigners",
+    "opt-aud-both": "👥 Shared",
+    "search-input": "Search by colonia, slang, or keyword (e.g. sarro, SAT, deposit, CFE)...",
+
+    // Tab 3: Product Voids
+    "badge-pill-voids": "Import Demand & Arbitrage",
+    "voids-title-heading": "🎁 Product Voids: \"I Wish They Sold This in Mexico\"",
+    "voids-desc-text": "Monitoring foreign consumer goods available in the US, China, Japan, and Europe that Mexican consumers actively search for but cannot purchase domestically due to regulatory or distribution barriers.",
+    "void-filter-label": "Filter by Origin:",
+    "void-btn-all": "All Origins",
+    "void-btn-usa": "🇺🇸 USA Retail",
+    "void-btn-china": "🇨🇳 China Direct",
+    "void-btn-japan": "🇯🇵 Japan & Korea",
+    "void-btn-europe": "🇪🇺 Europe Direct",
+    "void-search-input": "Search product voids (e.g. countertop dishwasher, seasonings, sunscreens, smart relays)...",
+    "btn-toggle-wish-text": "+ Submit Wishlist Item",
+    "wish-panel-title": "✦ Suggest a Product You Wish Was Sold in Mexico",
+    "wish-panel-desc": "Contribute to the research database. Suggestions are synthesized by the NLP Engine to formulate startup hypotheses.",
+    "label-wish-prod": "Product Name & Brand",
+    "label-wish-origin": "Available in (Origin Country)",
+    "label-wish-city": "Your City / Region",
+    "label-wish-desc": "Why isn't it sold / How do you currently obtain it?",
+    "btn-cancel-wish": "Cancel",
+    "btn-submit-wish": "Submit to Research Swarm",
+
+    // Tab 4: Ventures
+    "ventures-title-heading": "💡 Direct Market Opportunities & Venture Hypotheses",
+    "ventures-desc-text": "These startup concepts and business models are synthesized automatically from high-friction complaints and chronic service voids across Mexican cities.",
+
+    // Tab 5: WhatsApp
+    "wa-title-heading": "💬 WhatsApp 'Vecinos' Community Chat Parser",
+    "wa-desc-text": "Paste exported residential chat logs from Mexican neighborhood groups (Condesa, Roma, Mérida Norte). Automatically scrubs phone numbers, names, and addresses under Mexican privacy law.",
+    "btn-wa-load-sample": "Load Sample Chat (Condesa)",
+    "btn-wa-parse": "Scrub PII & Ingest Chat",
+    "wa-results-title": "✦ Extracted Community Problems",
+
+    // Tab 6: Mercado Libre México
+    "ml-live-badge": "Exclusively Mercado Libre Mexico (mercadolibre.com.mx)",
+    "ml-tab-title": "Mercado Libre Mexico: Pricing, Quality & Consumer Complaints",
+    "ml-tab-subtitle": "Continuous scraping and intelligence extraction from mercadolibre.com.mx on products facing Yucatan hard water sarro, CFE voltage spikes, and retail import markups.",
+    "btn-run-ml-label": "Run Mercado Libre Scraper",
+    "btn-visit-ml-label": "Visit MLM ↗",
+    "ml-kpi-tracked-label": "Key Tracked Products",
+    "ml-kpi-tracked-sub": "Water Filters, Surge Protectors, Dehumidifiers",
+    "ml-kpi-rating-label": "Average User Rating",
+    "ml-kpi-rating-sub": "1,950+ Reviews analyzed across Mexico",
+    "ml-kpi-price-label": "Price Range (MXN)",
+    "ml-kpi-price-sub": "MXN peso pricing with nationwide shipping",
+    "ml-kpi-friction-label": "Critical Failure Alerts",
+    "ml-kpi-friction-sub": "Limestone scaling, CFE surges & tropical climate",
+
+    // Tab 7: Agents
+    "audit-badge-title": "Swarm Executive Audit",
+    "audit-badge-agents": "8/8 Agents Operational",
+    "audit-title-heading": "Autonomous Agent Activity & Dossiers",
+    "audit-desc-text": "Full audit of data collection, PII sanitization under Mexican law, modismos scoring, and startup synthesis across Mexican cities.",
+    "btn-run-full-swarm-text": "Run Full Agent Swarm",
+    "btn-run-ml-text": "Run Mercado Libre Agent"
+  }
+};
+
+// Initialization on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
+  initLanguage();
   initTabs();
   initModals();
   initActions();
   initFilters();
   initProductVoids();
 
-  // Load initial data
+  // Load datasets
   loadMetrics();
-  loadLatestReport();
+  loadLatestReport(currentRegion, currentLang);
   loadProblems();
   loadProductVoids();
+  loadMercadoLibreProducts();
 });
 
-// 1. Tab Navigation
+// 1. Language Switcher Initialization & Handler
+function initLanguage() {
+  const path = window.location.pathname.toLowerCase();
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramLang = urlParams.get("lang");
+  const storedLang = localStorage.getItem("mex_pulse_lang");
+
+  if (path === "/en" || paramLang === "en") {
+    currentLang = "en";
+  } else if (path === "/es" || paramLang === "es") {
+    currentLang = "es";
+  } else if (storedLang === "en" || storedLang === "es") {
+    currentLang = storedLang;
+  } else {
+    currentLang = "es"; // Default Spanish
+  }
+
+  // Bind Buttons
+  const btnEs = document.getElementById("btn-lang-es");
+  const btnEn = document.getElementById("btn-lang-en");
+
+  if (btnEs) {
+    btnEs.addEventListener("click", () => setLanguage("es"));
+  }
+  if (btnEn) {
+    btnEn.addEventListener("click", () => setLanguage("en"));
+  }
+
+  setLanguage(currentLang, false);
+}
+
+function setLanguage(lang, triggerReload = true) {
+  currentLang = (lang === "en") ? "en" : "es";
+  localStorage.setItem("mex_pulse_lang", currentLang);
+  document.documentElement.lang = currentLang;
+
+  // Toggle active button
+  const btnEs = document.getElementById("btn-lang-es");
+  const btnEn = document.getElementById("btn-lang-en");
+  if (btnEs && btnEn) {
+    if (currentLang === "es") {
+      btnEs.classList.add("active");
+      btnEn.classList.remove("active");
+    } else {
+      btnEn.classList.add("active");
+      btnEs.classList.remove("active");
+    }
+  }
+
+  // Update dynamic translations
+  const dict = TRANSLATIONS[currentLang] || TRANSLATIONS.es;
+  for (const [id, text] of Object.entries(dict)) {
+    const el = document.getElementById(id);
+    if (el) {
+      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+        el.placeholder = text;
+      } else {
+        el.textContent = text;
+      }
+    }
+  }
+
+  // Update document title
+  if (currentLang === "es") {
+    document.title = "MexConsumerPulse | Inteligencia del Consumidor Urbano en México";
+  } else {
+    document.title = "MexConsumerPulse | Mexican Urban Consumer Problems & Market Intelligence";
+  }
+
+  if (triggerReload) {
+    showToast(currentLang === "es" ? "Idioma cambiado a Español 🇲🇽" : "Language switched to English 🇺🇸");
+    loadLatestReport(currentRegion, currentLang);
+    renderFilteredProblems();
+    filterAndRenderProductVoids();
+    renderMercadoLibreProducts(allMLProducts);
+  }
+}
+
+// 2. Tab Navigation
 function initTabs() {
   const tabs = document.querySelectorAll(".tab-btn");
   tabs.forEach(tab => {
@@ -39,7 +337,7 @@ function initTabs() {
   });
 }
 
-// 2. Modals & Notifications
+// 3. Modals & Notifications
 function initModals() {
   const fbModal = document.getElementById("fb-modal");
   const btnFbSession = document.getElementById("btn-fb-session");
@@ -47,8 +345,8 @@ function initModals() {
   const btnCancel = document.getElementById("btn-modal-cancel");
   const btnLaunch = document.getElementById("btn-modal-launch-fb");
 
-  const openModal = () => fbModal.classList.add("active");
-  const closeModal = () => fbModal.classList.remove("active");
+  const openModal = () => fbModal && fbModal.classList.add("active");
+  const closeModal = () => fbModal && fbModal.classList.remove("active");
 
   if (btnFbSession) btnFbSession.addEventListener("click", openModal);
   if (btnClose) btnClose.addEventListener("click", closeModal);
@@ -56,10 +354,10 @@ function initModals() {
 
   if (btnLaunch) {
     btnLaunch.addEventListener("click", () => {
-      showToast("Launching headed browser for Facebook login...");
+      showToast(currentLang === "es" ? "Lanzando navegador para inicio de sesión en FB..." : "Launching browser for Facebook login...");
       closeModal();
       fetch("/api/agents/run/facebook", { method: "POST" })
-        .then(() => showToast("Facebook browser process started! Check browser window."))
+        .then(() => showToast(currentLang === "es" ? "Navegador de Facebook iniciado." : "Facebook browser process started."))
         .catch(err => showToast("Error: " + err.message));
     });
   }
@@ -77,10 +375,10 @@ function showToast(message) {
 
   msgElem.textContent = message;
   toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 4000);
+  setTimeout(() => toast.classList.remove("show"), 3800);
 }
 
-// 3. Header Action Buttons
+// 4. Header Actions
 function initActions() {
   const btnRunSwarm = document.getElementById("btn-run-swarm");
   const btnExportCsv = document.getElementById("btn-export-csv");
@@ -88,18 +386,19 @@ function initActions() {
 
   if (btnRunSwarm) {
     btnRunSwarm.addEventListener("click", () => {
-      showToast("Triggering full autonomous agent swarm run...");
+      showToast(currentLang === "es" ? "Ejecutando enjambre autónomo de agentes..." : "Triggering full autonomous agent swarm run...");
       fetch("/api/agents/run/all", { method: "POST" })
         .then(res => res.json())
-        .then(data => {
-          showToast("Swarm run initiated in background! Updating live data...");
+        .then(() => {
+          showToast(currentLang === "es" ? "Enjambre iniciado en segundo plano. Actualizando datos..." : "Swarm run initiated! Updating live data...");
           setTimeout(() => {
             loadMetrics();
-            loadLatestReport();
+            loadLatestReport(currentRegion, currentLang);
             loadProblems();
+            loadMercadoLibreProducts();
           }, 4000);
         })
-        .catch(err => showToast("Failed to run swarm: " + err.message));
+        .catch(err => showToast("Error: " + err.message));
     });
   }
 
@@ -112,26 +411,26 @@ function initActions() {
   if (btnDownloadMd) {
     btnDownloadMd.addEventListener("click", () => {
       if (!latestReportData || !latestReportData.markdown_content) {
-        showToast("No report currently available to download.");
+        showToast(currentLang === "es" ? "No hay informe disponible para descargar." : "No report currently available to download.");
         return;
       }
       const blob = new Blob([latestReportData.markdown_content], { type: "text/markdown;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `mexico_consumer_report_${latestReportData.report_date || "latest"}.md`;
+      a.download = `mexico_consumer_report_${latestReportData.report_date || "latest"}_${currentLang}.md`;
       a.click();
       URL.revokeObjectURL(url);
     });
   }
 
-  // Regional Report Switcher
+  // Regional Report Selector
   const regionSelect = document.getElementById("select-report-region");
   if (regionSelect) {
     regionSelect.addEventListener("change", (e) => {
-      const selected = e.target.value;
-      showToast(`Loading ${selected} intelligence report...`);
-      loadLatestReport(selected);
+      currentRegion = e.target.value;
+      showToast(currentLang === "es" ? `Cargando informe de ${currentRegion}...` : `Loading ${currentRegion} intelligence report...`);
+      loadLatestReport(currentRegion, currentLang);
     });
   }
 
@@ -154,7 +453,7 @@ function initWhatsAppHandler() {
 [14/10/26, 08:22:45] Mariana Condesa: ¿Alguien tiene el contacto de una pipa de agua particular confiable? Los del teléfono de siempre quieren cobrar $2,200 pesos por 5,000 litros y dicen que tardan 8 horas en llegar.
 [14/10/26, 09:30:12] +52 55 4321 8765: Oigan vecinos, aviso urgente: no contraten a un señor que se hace llamar 'Maestro Carlos' para reparar calentadores. Nos cobró $1,500 de anticipo de refacciones y nos dejó el boiler desarmado y ya no contesta las llamadas ni WhatsApp.
 [14/10/26, 11:05:00] Alberto R: ¿Alguien sabe si CFE avisó de corte de luz para hoy? En la esquina de Parras se escuchó un tronido fuerte en el transformador y varios departamentos nos quedamos a oscuras.`;
-      showToast("Sample Condesa chat loaded! Click 'Scrub & Ingest Chat' to process.");
+      showToast(currentLang === "es" ? "Chat de muestra cargado. Haga clic en 'Limpiar PII e Ingerir'." : "Sample Condesa chat loaded!");
     });
   }
 
@@ -162,31 +461,31 @@ function initWhatsAppHandler() {
     btnParse.addEventListener("click", async () => {
       const chatText = chatInput.value.trim();
       if (!chatText) {
-        showToast("Please paste chat text or click 'Load Sample Chat'.");
+        showToast(currentLang === "es" ? "Pegue texto del chat antes de continuar." : "Please paste chat text.");
         return;
       }
 
-      showToast("Scrubbing PII and extracting problems via WhatsAppVecinosAgent...");
+      showToast(currentLang === "es" ? "Anonimizando PII y procesando problemas vecinales..." : "Scrubbing PII and extracting problems...");
       try {
         const res = await fetch("/api/whatsapp/import", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_text: chatText,
-            group_name: groupInput.value || "Chat de Vecinos",
-            city: cityInput.value || "Mexico City (CDMX)"
+            group_name: groupInput?.value || "Chat de Vecinos Condesa",
+            city: cityInput?.value || "Mexico City (CDMX)"
           })
         });
 
         const data = await res.json();
-        showToast(`Successfully extracted ${data.extracted_count} problems! Updating database...`);
+        showToast(currentLang === "es" ? `¡Se extrajeron ${data.extracted_count} problemas con éxito!` : `Extracted ${data.extracted_count} problems!`);
 
         if (data.problems && data.problems.length > 0) {
           resultsPanel.style.display = "block";
           extractedGrid.innerHTML = data.problems.map(p => `
             <div class="problem-card">
               <div class="problem-card-header">
-                <span class="problem-category-badge">${p.category}</span>
+                <span class="problem-category-badge">${escapeHtml(p.category)}</span>
                 <span class="problem-urgency">🔴🔴🔴🔴 ${p.urgency}/5</span>
               </div>
               <h4 class="problem-title">${escapeHtml(p.title)}</h4>
@@ -197,7 +496,7 @@ function initWhatsAppHandler() {
               </div>
               ${p.venture_concept ? `
                 <div class="problem-opp-box">
-                  <div class="problem-opp-title">💡 Venture Hypothesis</div>
+                  <div class="problem-opp-title">💡 ${currentLang === "es" ? "Hipótesis de Negocio" : "Venture Hypothesis"}</div>
                   <div><strong>${escapeHtml(p.venture_concept)}</strong>: ${escapeHtml(p.solution_summary || "")}</div>
                 </div>
               ` : ''}
@@ -205,19 +504,17 @@ function initWhatsAppHandler() {
           `).join("");
         }
 
-        // Refresh global metrics & problems
         loadMetrics();
         loadProblems();
-        loadLatestReport();
-
+        loadLatestReport(currentRegion, currentLang);
       } catch (err) {
-        showToast("Error processing WhatsApp chat: " + err.message);
+        showToast("Error: " + err.message);
       }
     });
   }
 }
 
-// 4. Load Metrics
+// 5. Load Metrics
 async function loadMetrics() {
   try {
     const res = await fetch("/api/metrics");
@@ -226,25 +523,22 @@ async function loadMetrics() {
     document.getElementById("val-total-problems").textContent = data.total_problems || "0";
     document.getElementById("val-urgent-problems").textContent = data.urgent_problems_count || "0";
     
-    // Top category
     const byCat = data.by_category || {};
     const topCat = Object.keys(byCat).length ? Object.keys(byCat).reduce((a, b) => byCat[a] > byCat[b] ? a : b) : "Infrastructure";
     document.getElementById("val-top-category").textContent = topCat.split("&")[0].trim();
 
-    // Audience split
     const aud = data.by_audience || {};
     const local = aud["Local"] || 0;
     const expat = aud["Expat"] || 0;
     const shared = aud["Both"] || 0;
     document.getElementById("val-audience-split").textContent = `${local}L / ${expat}E / ${shared}S`;
-
   } catch (e) {
     console.error("Failed to load metrics:", e);
   }
 }
 
-// 5. Load Latest Daily Report (Regional or National)
-async function loadLatestReport(region = "All") {
+// 6. Load Latest Daily Report (Dual Language)
+async function loadLatestReport(region = "All", lang = currentLang) {
   const container = document.getElementById("report-rendered-markdown");
   const execBox = document.getElementById("exec-summary-box");
   const titleDisplay = document.getElementById("report-title-display");
@@ -252,19 +546,19 @@ async function loadLatestReport(region = "All") {
   const regionBadge = document.getElementById("report-region-badge");
 
   try {
-    container.innerHTML = `<div class="loading-state"><div class="spinner"></div><span>Loading ${region} intelligence briefing...</span></div>`;
+    container.innerHTML = `<div class="loading-state"><div class="spinner"></div><span>${lang === "es" ? "Cargando informe ejecutivo de inteligencia..." : `Loading ${region} intelligence briefing...`}</span></div>`;
     
-    const res = await fetch(`/api/reports/latest?region=${encodeURIComponent(region)}`);
+    const res = await fetch(`/api/reports/latest?region=${encodeURIComponent(region)}&lang=${lang}`);
     const data = await res.json();
     latestReportData = data;
 
     if (!data || !data.markdown_content) {
-      container.innerHTML = `<p>No report generated yet for ${region}. Click 'Run Agent Swarm' to compile.</p>`;
+      container.innerHTML = `<p>${lang === "es" ? "Aún no se ha generado informe para esta región. Haga clic en 'Ejecutar Enjambre'." : `No report generated yet for ${region}. Click 'Run Agent Swarm'.`}</p>`;
       return;
     }
 
     titleDisplay.textContent = data.report_title || `${region} Consumer Problem Intelligence Report`;
-    metaDisplay.textContent = `Report Key: ${data.report_date} • 100% Ley Federal Data-Protected • Scope: ${region}`;
+    metaDisplay.textContent = `Report Key: ${data.report_date} • 100% Ley Federal Data-Protected • Scope: ${region} • ${lang.toUpperCase()}`;
     if (regionBadge) regionBadge.textContent = region;
 
     // Executive summary bullets
@@ -272,7 +566,7 @@ async function loadLatestReport(region = "All") {
       const bullets = data.executive_summary.split("\n").filter(l => l.trim().length > 0);
       execBox.innerHTML = `
         <h4 style="font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--accent-green); margin-bottom: 10px;">
-          ✦ Executive Briefing Takeaways (${region})
+          ✦ ${lang === "es" ? `Puntos Clave del Resumen Ejecutivo (${region})` : `Executive Briefing Takeaways (${region})`}
         </h4>
         <ul>
           ${bullets.map(b => `<li>${formatMarkdownText(b.replace(/^-\s*/, ''))}</li>`).join("")}
@@ -283,20 +577,16 @@ async function loadLatestReport(region = "All") {
       execBox.style.display = "none";
     }
 
-    // Render markdown content
     container.innerHTML = parseMarkdownToHtml(data.markdown_content);
-
   } catch (e) {
     console.error("Failed to load latest report:", e);
     container.innerHTML = "<p>Error loading daily report.</p>";
   }
 }
 
-// 6. Load & Filter Problems
+// 7. Load & Filter Problems
 async function loadProblems() {
   const grid = document.getElementById("problems-grid");
-  const counter = document.getElementById("records-counter");
-
   try {
     const res = await fetch("/api/problems?limit=300");
     allProblems = await res.json();
@@ -304,7 +594,7 @@ async function loadProblems() {
     renderVentureOpportunities(allProblems);
   } catch (e) {
     console.error("Failed to load problems:", e);
-    grid.innerHTML = "<p>Error loading problem records.</p>";
+    if (grid) grid.innerHTML = "<p>Error loading problem records.</p>";
   }
 }
 
@@ -325,6 +615,7 @@ function initFilters() {
 function renderFilteredProblems() {
   const grid = document.getElementById("problems-grid");
   const counter = document.getElementById("records-counter");
+  if (!grid) return;
 
   const cityVal = document.getElementById("filter-city")?.value || "All";
   const catVal = document.getElementById("filter-category")?.value || "All";
@@ -342,24 +633,28 @@ function renderFilteredProblems() {
     return true;
   });
 
-  counter.textContent = `Showing ${filtered.length} of ${allProblems.length} monitored problems`;
+  if (counter) {
+    counter.textContent = (currentLang === "es")
+      ? `Mostrando ${filtered.length} de ${allProblems.length} problemas monitoreados`
+      : `Showing ${filtered.length} of ${allProblems.length} monitored problems`;
+  }
 
   if (!filtered.length) {
     grid.innerHTML = `<div style="grid-column: 1 / -1; padding: 40px; text-align: center; color: var(--text-muted);">
-      No consumer problems found matching these criteria.
+      ${currentLang === "es" ? "No se encontraron problemas que coincidan con estos criterios." : "No consumer problems found matching these criteria."}
     </div>`;
     return;
   }
 
   grid.innerHTML = filtered.map(p => {
     const urgencyStars = "🔴".repeat(p.urgency || 3);
-    const audienceTag = p.audience === "Expat" ? "🇺🇸 Expats" : (p.audience === "Local" ? "🇲🇽 Locals" : "👥 Shared");
+    const audienceTag = p.audience === "Expat" ? "🇺🇸 Expats" : (p.audience === "Local" ? "🇲🇽 Locales" : "👥 Compartido");
     
     return `
       <div class="problem-card">
         <div>
           <div class="problem-card-header">
-            <span class="problem-category-badge">${p.category}</span>
+            <span class="problem-category-badge">${escapeHtml(p.category)}</span>
             <span class="problem-urgency">${urgencyStars} ${p.urgency}/5</span>
           </div>
 
@@ -375,7 +670,7 @@ function renderFilteredProblems() {
 
         ${p.venture_concept ? `
           <div class="problem-opp-box">
-            <div class="problem-opp-title">💡 Market Solution Concept</div>
+            <div class="problem-opp-title">💡 ${currentLang === "es" ? "Concepto de Solución" : "Market Solution Concept"}</div>
             <div><strong>${escapeHtml(p.venture_concept)}</strong>: ${escapeHtml(p.solution_summary || "")}</div>
           </div>
         ` : ''}
@@ -384,7 +679,7 @@ function renderFilteredProblems() {
   }).join("");
 }
 
-// 7. Render Venture Opportunities Matrix
+// 8. Render Venture Opportunities Matrix
 function renderVentureOpportunities(problems) {
   const container = document.getElementById("ventures-grid");
   if (!container) return;
@@ -400,7 +695,7 @@ function renderVentureOpportunities(problems) {
   });
 
   if (!uniqueVentures.length) {
-    container.innerHTML = "<p>No venture hypotheses synthesized yet.</p>";
+    container.innerHTML = `<p>${currentLang === "es" ? "Aún no hay hipótesis sintetizadas." : "No venture hypotheses synthesized yet."}</p>`;
     return;
   }
 
@@ -408,103 +703,136 @@ function renderVentureOpportunities(problems) {
     return `
       <div class="venture-card glass-panel">
         <div class="venture-header">
-          <span class="venture-badge">${v.category}</span>
+          <span class="venture-badge">${escapeHtml(v.category)}</span>
           <h3 class="venture-concept">💡 ${escapeHtml(v.venture_concept)}</h3>
-          <p class="venture-desc">${escapeHtml(v.solution_summary || "Automated tech platform addressing chronic consumer pain points in Mexican metropolitan hubs.")}</p>
+          <p class="venture-desc">${escapeHtml(v.solution_summary || "Oportunidad de mercado para resolver fricciones recurrentes de consumidores en México.")}</p>
         </div>
 
         <div class="venture-tags">
-          <span class="meta-pill">Target: ${escapeHtml(v.audience)}</span>
-          <span class="meta-pill">Location: ${escapeHtml(v.city)}</span>
-          <span class="meta-pill">Signal: ${escapeHtml(v.source_platform)}</span>
+          <span class="meta-pill">Población: ${escapeHtml(v.audience)}</span>
+          <span class="meta-pill">Ubicación: ${escapeHtml(v.city)}</span>
+          <span class="meta-pill">Fuente: ${escapeHtml(v.source_platform)}</span>
         </div>
       </div>
     `;
   }).join("");
 }
 
-// 8. Trigger Single Agent
-function triggerSingleAgent(agentName) {
-  showToast(`Starting ${agentName} agent in background...`);
-  fetch(`/api/agents/run/${agentName}`, { method: "POST" })
-    .then(r => r.json())
-    .then(d => {
-      showToast(`Agent '${agentName}' triggered successfully.`);
-      setTimeout(() => {
-        loadMetrics();
-        loadLatestReport();
-        loadProblems();
-      }, 3500);
-    })
-    .catch(e => showToast("Error triggering agent: " + e.message));
-}
+// 9. Mercado Libre México Intelligence Loader & Renderer
+async function loadMercadoLibreProducts() {
+  const grid = document.getElementById("mercadolibre-products-grid");
+  try {
+    const res = await fetch("/api/mercadolibre/products");
+    allMLProducts = await res.json();
 
-// 9. Markdown Parser Utility
-function parseMarkdownToHtml(md) {
-  if (!md) return "";
-  let html = md;
+    // Update Quick Stats
+    const totalEl = document.getElementById("ml-stat-total");
+    const ratingEl = document.getElementById("ml-stat-rating");
+    const rangeEl = document.getElementById("ml-stat-range");
+    const countBadge = document.getElementById("ml-count-badge");
 
-  // Headers
-  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
-  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
-  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    if (totalEl) totalEl.textContent = `${allMLProducts.length} ${currentLang === "es" ? "Artículos" : "Items"}`;
+    if (countBadge) countBadge.textContent = `${allMLProducts.length} ${currentLang === "es" ? "Productos Monitoreados" : "Tracked Products"}`;
+    
+    if (allMLProducts.length > 0) {
+      const avgRating = (allMLProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / allMLProducts.length).toFixed(1);
+      if (ratingEl) ratingEl.textContent = `${avgRating} / 5.0`;
 
-  // Blockquotes
-  html = html.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
-
-  // Bold & Italic
-  html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
-  html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
-  html = html.replace(/`(.*?)`/gim, '<code>$1</code>');
-
-  // Tables
-  const tableRegex = /\|(.+)\|[\r\n]+\|[-:| ]+\|[\r\n]+((?:\|.+\|[\r\n]*)+)/g;
-  html = html.replace(tableRegex, (match, header, body) => {
-    const headers = header.split('|').map(h => h.trim()).filter(Boolean);
-    const rows = body.trim().split('\n').map(r => r.split('|').map(c => c.trim()).filter(Boolean));
-
-    const ths = headers.map(h => `<th>${h}</th>`).join('');
-    const trs = rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('');
-    return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
-  });
-
-  // Lists
-  html = html.replace(/^\- (.*$)/gim, '<li>$1</li>');
-  html = html.replace(/<\/li>\n<li>/g, '</li><li>');
-  html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-
-  // Paragraphs
-  html = html.split('\n\n').map(p => {
-    p = p.trim();
-    if (!p.startsWith('<h') && !p.startsWith('<ul') && !p.startsWith('<table') && !p.startsWith('<blockquote') && p.length > 0) {
-      return `<p>${p}</p>`;
+      const prices = allMLProducts.map(p => p.price_mxn).filter(p => p > 0);
+      if (prices.length > 0 && rangeEl) {
+        const minP = Math.min(...prices);
+        const maxP = Math.max(...prices);
+        rangeEl.textContent = `$${minP.toLocaleString()} – $${maxP.toLocaleString()}`;
+      }
     }
-    return p;
-  }).join('\n');
 
-  return html;
+    renderMercadoLibreProducts(allMLProducts);
+  } catch (err) {
+    console.error("Failed to load Mercado Libre products:", err);
+    if (grid) grid.innerHTML = "<p>Error loading Mercado Libre data.</p>";
+  }
 }
 
-function formatMarkdownText(text) {
-  return text
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code>$1</code>');
+function renderMercadoLibreProducts(products) {
+  const grid = document.getElementById("mercadolibre-products-grid");
+  if (!grid) return;
+
+  if (!products.length) {
+    grid.innerHTML = `
+      <div class="empty-state glass-panel" style="grid-column: 1 / -1; padding: 32px; text-align: center;">
+        <span style="font-size: 32px;">🛒</span>
+        <h3 style="margin-top: 8px;">${currentLang === "es" ? "No se han registrado productos de Mercado Libre" : "No Mercado Libre products recorded"}</h3>
+        <p style="color: var(--text-muted); font-size: 13px;">${currentLang === "es" ? "Haga clic en 'Ejecutar Scraper Mercado Libre' para escanear." : "Click 'Run Mercado Libre Scraper' to harvest items."}</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = products.map(item => {
+    const reviews = item.reviews || [];
+    const ratingStars = "⭐".repeat(Math.round(item.rating || 4));
+
+    return `
+      <div class="problem-card glass-panel" style="border-top: 3px solid #ffe600; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="problem-card-header">
+            <span class="badge badge-ml">🛒 ${escapeHtml(item.mlm_id || "MLM México")}</span>
+            <span class="ml-rating-tag">${ratingStars} ${item.rating}/5 (${item.review_count} ${currentLang === "es" ? "opiniones" : "reviews"})</span>
+          </div>
+
+          <h4 class="problem-title" style="color: #fff; font-size: 15px; margin: 10px 0 4px;">
+            ${escapeHtml(item.title)}
+          </h4>
+
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 12px;">
+            <div class="ml-price-tag">$${Number(item.price_mxn || 0).toLocaleString()} MXN</div>
+            <div class="ml-seller-loc">📍 ${escapeHtml(item.seller_location || "México (Envío Full)")}</div>
+          </div>
+
+          <!-- Problem / Friction Alert -->
+          <div style="background: rgba(255, 71, 87, 0.08); border-left: 2px solid var(--accent-red); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: var(--text-main);">
+            <strong style="color: var(--accent-red);">⚠️ ${currentLang === "es" ? "Falla Regional Crítica" : "Regional Friction Alert"}:</strong> 
+            ${escapeHtml(item.problem_summary || "Incompatibilidad reportada con infraestructura local mexicana.")}
+          </div>
+
+          <!-- Customer Verbatim Reviews -->
+          <div style="margin: 10px 0;">
+            <div style="font-size: 11px; font-weight: 700; color: #ffe600; text-transform: uppercase;">
+              ${currentLang === "es" ? "💬 Reseñas Reales de Compradores Mexicanos:" : "💬 Verified Mexican Buyer Reviews:"}
+            </div>
+            ${reviews.map(r => `
+              <div class="ml-review-card">"${escapeHtml(r)}"</div>
+            `).join("")}
+          </div>
+
+          <!-- Solution Found & Workaround -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 4px; padding: 8px 12px; margin: 8px 0; font-size: 11px;">
+            <span style="color: var(--text-dim); font-weight: 700;">${currentLang === "es" ? "SOLUCIÓN ACTUAL" : "CURRENT WORKAROUND"}:</span>
+            <div style="color: var(--text-main); margin-top: 2px;">${escapeHtml(item.solution_found || "Compra de adaptadores adicionales o reemplazos continuos.")}</div>
+          </div>
+        </div>
+
+        <div>
+          ${item.venture_concept ? `
+            <div class="problem-opp-box" style="margin-top: 10px; border-color: rgba(255, 230, 0, 0.3);">
+              <div class="problem-opp-title" style="color: #ffe600;">💡 ${currentLang === "es" ? "Oportunidad de Emprendimiento y Arbitraje" : "Venture Opportunity & Local Parity"}</div>
+              <div style="font-size: 12px;"><strong>${escapeHtml(item.venture_concept)}</strong></div>
+            </div>
+          ` : ''}
+
+          <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
+            <a href="${escapeHtml(item.url || 'https://www.mercadolibre.com.mx/')}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 11px;">
+              ${currentLang === "es" ? "Ver Artículo en Mercado Libre ↗" : "View on Mercado Libre ↗"}
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
-function escapeHtml(str) {
-  if (!str) return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-// 10. Product Voids & "I Wish They Sold This" Handler
+// 10. Product Voids Handler
 function initProductVoids() {
-  // Origin Filter Buttons
   const filterBtns = document.querySelectorAll(".void-filter-btn");
   filterBtns.forEach(btn => {
     btn.addEventListener("click", () => {
@@ -515,7 +843,6 @@ function initProductVoids() {
     });
   });
 
-  // Search Input
   const searchInput = document.getElementById("void-search-input");
   if (searchInput) {
     searchInput.addEventListener("input", () => {
@@ -523,7 +850,6 @@ function initProductVoids() {
     });
   }
 
-  // Toggle Submission Form
   const toggleBtn = document.getElementById("btn-toggle-wish-form");
   const cancelBtn = document.getElementById("btn-cancel-wish");
   const formPanel = document.getElementById("wish-submit-panel");
@@ -544,7 +870,6 @@ function initProductVoids() {
     });
   }
 
-  // Submit Wishlist Item
   const submitBtn = document.getElementById("btn-submit-wish");
   if (submitBtn) {
     submitBtn.addEventListener("click", async () => {
@@ -554,11 +879,11 @@ function initProductVoids() {
       const desc = document.getElementById("wish-description")?.value.trim() || "";
 
       if (!prodName) {
-        showToast("Please enter a product name.");
+        showToast(currentLang === "es" ? "Por favor ingrese el nombre del producto." : "Please enter a product name.");
         return;
       }
 
-      showToast(`Submitting wishlist item '${prodName}'...`);
+      showToast(currentLang === "es" ? `Registrando deseo: '${prodName}'...` : `Submitting wishlist item '${prodName}'...`);
       try {
         const res = await fetch("/api/product-voids/submit", {
           method: "POST",
@@ -572,21 +897,19 @@ function initProductVoids() {
         });
 
         const data = await res.json();
-        showToast(data.message || "Product void logged successfully!");
+        showToast(data.message || (currentLang === "es" ? "¡Vacío de producto registrado!" : "Product void logged successfully!"));
         
-        // Reset form
         const inputElem = document.getElementById("wish-product-name");
         if (inputElem) inputElem.value = "";
         const descElem = document.getElementById("wish-description");
         if (descElem) descElem.value = "";
         if (formPanel) formPanel.style.display = "none";
 
-        // Refresh data
         loadProductVoids();
         loadMetrics();
         loadProblems();
       } catch (err) {
-        showToast("Error submitting wishlist item: " + err.message);
+        showToast("Error: " + err.message);
       }
     });
   }
@@ -599,7 +922,7 @@ async function loadProductVoids() {
     
     const counterBadge = document.getElementById("voids-counter-badge");
     if (counterBadge) {
-      counterBadge.textContent = `${allProductVoids.length} Verified Voids`;
+      counterBadge.textContent = `${allProductVoids.length} ${currentLang === "es" ? "Vacíos Verificados" : "Verified Voids"}`;
     }
 
     filterAndRenderProductVoids();
@@ -643,29 +966,28 @@ function renderProductVoids(voids) {
     grid.innerHTML = `
       <div class="empty-state glass-panel" style="grid-column: 1 / -1; padding: 32px; text-align: center;">
         <span style="font-size: 32px;">🔍</span>
-        <h3 style="margin-top: 8px;">No product voids matching current filters</h3>
-        <p style="color: var(--text-muted); font-size: 13px;">Try switching origin countries or click '+ Submit Wishlist Item' to add one.</p>
+        <h3 style="margin-top: 8px;">${currentLang === "es" ? "No hay vacíos de producto para este filtro" : "No product voids matching current filters"}</h3>
+        <p style="color: var(--text-muted); font-size: 13px;">${currentLang === "es" ? "Cambie el país de origen o agregue uno nuevo con '+ Enviar Producto Deseado'." : "Try switching origin countries or click '+ Submit Wishlist Item' to add one."}</p>
       </div>
     `;
     return;
   }
 
   grid.innerHTML = voids.map(v => {
-    // Detect origin badge
     const txt = `${v.title} ${v.content}`.toLowerCase();
-    let originBadge = "🌍 International";
+    let originBadge = currentLang === "es" ? "🌍 Internacional" : "🌍 International";
     let originClass = "badge-info";
     if (txt.includes("trader") || txt.includes("melatonina") || txt.includes("creami") || txt.includes("areneros") || txt.includes("costco") || txt.includes("usa") || txt.includes("gabacho")) {
-      originBadge = "🇺🇸 Available in USA Retail";
+      originBadge = currentLang === "es" ? "🇺🇸 Disponible en EE.UU." : "🇺🇸 Available in USA Retail";
       originClass = "badge-success";
     } else if (txt.includes("china") || txt.includes("zigbee") || txt.includes("aspiradoras") || txt.includes("molinos") || txt.includes("aliexpress")) {
-      originBadge = "🇨🇳 Direct from China";
+      originBadge = currentLang === "es" ? "🇨🇳 Directo de China" : "🇨🇳 Direct from China";
       originClass = "badge-accent";
     } else if (txt.includes("japón") || txt.includes("japan") || txt.includes("corea") || txt.includes("korea") || txt.includes("biore") || txt.includes("deshumidificadores")) {
-      originBadge = "🇯🇵 Japan & Korea Specialty";
+      originBadge = currentLang === "es" ? "🇯🇵 Especialidad Japón y Corea" : "🇯🇵 Japan & Korea Specialty";
       originClass = "badge-purple";
     } else if (txt.includes("europa") || txt.includes("europe") || txt.includes("progreso") || txt.includes("alemana")) {
-      originBadge = "🇪🇺 European Direct";
+      originBadge = currentLang === "es" ? "🇪🇺 Directo de Europa" : "🇪🇺 European Direct";
       originClass = "badge-info";
     }
 
@@ -676,20 +998,20 @@ function renderProductVoids(voids) {
         <div>
           <div class="problem-card-header">
             <span class="badge ${originClass}">${originBadge}</span>
-            <span class="problem-urgency">${urgencyStars} Void Severity</span>
+            <span class="problem-urgency">${urgencyStars} ${currentLang === "es" ? "Urgencia" : "Void Severity"}</span>
           </div>
 
           <h4 class="problem-title" style="color: #fff; font-size: 15px; margin: 10px 0 6px;">${escapeHtml(v.title)}</h4>
           
           <div style="background: rgba(0,0,0,0.25); border-left: 2px solid var(--accent-orange); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: var(--text-main);">
-            <strong style="color: var(--accent-orange);">⚠️ Root Cause / Barrier:</strong> ${escapeHtml(v.problem_summary || v.content.slice(0, 140))}
+            <strong style="color: var(--accent-orange);">⚠️ ${currentLang === "es" ? "Causa Raíz / Barrera" : "Root Cause / Barrier"}:</strong> ${escapeHtml(v.problem_summary || v.content.slice(0, 140))}
           </div>
 
           <p class="problem-content" style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">${escapeHtml(v.content ? v.content.slice(0, 180) + "..." : "")}</p>
 
           <div style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 4px; padding: 8px 12px; margin: 10px 0; font-size: 11px;">
-            <div style="color: var(--text-dim); font-weight: 700;">CONSUMER WORKAROUND:</div>
-            <div style="color: var(--text-main); margin-top: 2px;">${escapeHtml(v.solution_found || "No formal domestic channel; gray-market couriers or travel mule.")}</div>
+            <div style="color: var(--text-dim); font-weight: 700;">${currentLang === "es" ? "SOLUCIÓN ACTUAL DEL CONSUMIDOR" : "CONSUMER WORKAROUND"}:</div>
+            <div style="color: var(--text-main); margin-top: 2px;">${escapeHtml(v.solution_found || "Fayuca o casilleros postales pagando sobreprecio.")}</div>
           </div>
 
           <div class="problem-meta-row">
@@ -700,11 +1022,69 @@ function renderProductVoids(voids) {
 
         ${v.venture_concept ? `
           <div class="problem-opp-box" style="margin-top: 12px; border-color: rgba(0, 191, 255, 0.3);">
-            <div class="problem-opp-title" style="color: var(--accent-cyan);">💡 Import Arbitrage & Venture Concept</div>
+            <div class="problem-opp-title" style="color: var(--accent-cyan);">💡 ${currentLang === "es" ? "Oportunidad de Arbitraje / Emprendimiento" : "Import Arbitrage & Venture Concept"}</div>
             <div style="font-size: 12px;"><strong>${escapeHtml(v.venture_concept)}</strong>: ${escapeHtml(v.solution_summary || "")}</div>
           </div>
         ` : ''}
       </div>
     `;
   }).join("");
+}
+
+// 11. Trigger Single Agent (Globally Available)
+window.triggerSingleAgent = function(agentName) {
+  showToast(currentLang === "es" ? `Iniciando agente ${agentName}...` : `Starting ${agentName} agent in background...`);
+  fetch(`/api/agents/run/${agentName}`, { method: "POST" })
+    .then(r => r.json())
+    .then(() => {
+      showToast(currentLang === "es" ? `Agente '${agentName}' ejecutado con éxito.` : `Agent '${agentName}' triggered successfully.`);
+      setTimeout(() => {
+        loadMetrics();
+        loadLatestReport(currentRegion, currentLang);
+        loadProblems();
+        loadMercadoLibreProducts();
+      }, 3500);
+    })
+    .catch(e => showToast("Error: " + e.message));
+};
+
+// 12. Markdown Parser & HTML Escaping
+function parseMarkdownToHtml(md) {
+  if (!md) return "";
+  let html = md;
+
+  html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+  html = html.replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>');
+  html = html.replace(/\|(.+)\|/g, function(match) {
+    if (match.includes("---")) return "";
+    const cells = match.split("|").filter((_, i, arr) => i > 0 && i < arr.length - 1);
+    const renderedCells = cells.map(c => `<td>${formatMarkdownText(c.trim())}</td>`).join("");
+    return `<tr>${renderedCells}</tr>`;
+  });
+  html = html.replace(/(<tr>.+<\/tr>\s*)+/g, '<div class="table-responsive"><table class="data-table">$&</table></div>');
+  html = html.replace(/^\s*\-\s+(.*$)/gim, '<li>$1</li>');
+  html = html.replace(/(<li>.+<\/li>\s*)+/g, '<ul>$&</ul>');
+  html = formatMarkdownText(html);
+  html = html.replace(/\n\n/g, '<br><br>');
+  return html;
+}
+
+function formatMarkdownText(txt) {
+  if (!txt) return "";
+  return txt
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\`([^`]+)\`/g, '<code>$1</code>');
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }

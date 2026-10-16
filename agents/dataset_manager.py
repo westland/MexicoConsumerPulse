@@ -255,6 +255,25 @@ class DatasetManager:
             "total_exported": len(problems)
         }
 
+    def get_mercadolibre_products(self, limit: int = 50) -> List[Dict[str, Any]]:
+        """Retrieve all scraped Mercado Libre products with review breakdowns."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='mercadolibre_products'")
+            if not cursor.fetchone():
+                return []
+            cursor.execute("SELECT * FROM mercadolibre_products ORDER BY rating ASC, id DESC LIMIT ?", (limit,))
+            rows = cursor.fetchall()
+            output = []
+            for r in rows:
+                d = dict(r)
+                try:
+                    d["reviews"] = json.loads(d.get("reviews_json", "[]"))
+                except Exception:
+                    d["reviews"] = []
+                output.append(d)
+            return output
+
     def seed_product_voids(self) -> int:
         """
         Seeds authentic consumer expressions of 'I wish they sold this product in Mexico'

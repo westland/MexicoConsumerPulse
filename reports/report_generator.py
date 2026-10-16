@@ -244,10 +244,49 @@ class DailyReportGenerator:
                 md_lines.append(f"| **{title_short}** | {origin} | {barrier}... | {workaround}... | *{opp}* |")
             md_lines.append("")
 
+        # 7. Mercado Libre México Product Quality & Review Intelligence
+        ml_products = self.db.get_mercadolibre_products(limit=10)
+        if ml_products:
+            if lang == "es":
+                md_lines.append("## 7. Inteligencia de Productos y Reseñas en Mercado Libre México (mercadolibre.com.mx)")
+                md_lines.append("Monitoreo continuo de artículos de alta demanda en México, precios en MXN, calificaciones de usuarios y fallas críticas reportadas por compradores locales debido a incompatibilidades de infraestructura (sarro de agua, sobretensión de CFE, humedad tropical y sobreprecio por falta de distribución minorista formal).\n")
+                md_lines.append("| Producto (mercadolibre.com.mx) | Precio (MXN) | Calificación | Vendedor / Ubicación | Falla en México / Reseña Crítica de Comprador | Oportunidad de Emprendimiento |")
+                md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+            else:
+                md_lines.append("## 7. Mercado Libre Mexico Product Quality & Customer Review Intelligence (mercadolibre.com.mx)")
+                md_lines.append("Continuous monitoring of high-demand domestic Mexican listings, MXN pricing, user review ratings, and verified consumer complaints stemming from local conditions (hard water scaling, CFE grid voltage surges, tropical humidity, and retail markups).\n")
+                md_lines.append("| Product (mercadolibre.com.mx) | Price (MXN) | Rating | Seller Location | Local Failure Mode / Verified Mexican Review | Market Opportunity |")
+                md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+
+            for item in ml_products:
+                title_short = item.get('title', '')[:45]
+                price_str = f"${item.get('price_mxn', 0):,.0f} MXN"
+                rating_str = f"{item.get('rating', 0.0)}/5 ({item.get('review_count', 0)} op.)"
+                loc = item.get('seller_location', 'México')[:30]
+                reviews = item.get('reviews', [])
+                review_snip = reviews[0][:80] if reviews else (item.get('problem_summary', '')[:80])
+                opp = (item.get('venture_concept') or item.get('solution_found', ''))[:60]
+                md_lines.append(f"| **{title_short}** | {price_str} | {rating_str} | {loc} | {review_snip}... | *{opp}* |")
+            md_lines.append("")
+
+            # Highlight specific customer complaints from Mercado Libre México
+            if lang == "es":
+                md_lines.append("### Quejas Verificadas de Compradores Mexicanos en mercadolibre.com.mx:")
+            else:
+                md_lines.append("### Verified Mexican Consumer Review Callouts on mercadolibre.com.mx:")
+            
+            for item in ml_products[:4]:
+                reviews = item.get('reviews', [])
+                if reviews:
+                    md_lines.append(f"- **{item.get('title')}** (${item.get('price_mxn', 0):,.0f} MXN — {item.get('seller_location')}):")
+                    for rev in reviews[:2]:
+                        md_lines.append(f"  - *\"{rev}\"*")
+            md_lines.append("")
+
         if lang == "es":
-            md_lines.append("## 7. Citas Textuales Anónimas del Campo")
+            md_lines.append("## 8. Citas Textuales Anónimas del Campo")
         else:
-            md_lines.append("## 7. Verbatim Field Quotes (Anonymized)")
+            md_lines.append("## 8. Verbatim Field Quotes (Anonymized)")
 
         for idx, p in enumerate(problems[:6], 1):
             md_lines.append(f"> *\"{p.get('content', '')[:160]}...\"*")
