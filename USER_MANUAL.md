@@ -1,9 +1,10 @@
-# 🇲🇽 MexConsumerPulse — Complete User Manual & Feature Guide
+# 🇲🇽 MexConsumerPulse — Complete User Manual & Feature Guide (Release 1.14)
 
 > **Platform URL (Production):** [https://pulse-mexico.com/](https://pulse-mexico.com/)  
 > **Local Dashboard:** `http://localhost:8000/` (or run [`START_LOCAL_WEBSITE.bat`](START_LOCAL_WEBSITE.bat))  
 > **REST API Documentation:** [https://pulse-mexico.com/docs](https://pulse-mexico.com/docs)  
 > **Repository:** [https://github.com/westland/MexicoConsumerPulse](https://github.com/westland/MexicoConsumerPulse)  
+> **Latest Release:** [Release 1.14 on GitHub](https://github.com/westland/MexicoConsumerPulse/releases/tag/v1.14)  
 > **Language Support:** Full Dual-Language Engine (🇲🇽 Mexican Spanish & 🇺🇸 English)
 
 ---
@@ -13,7 +14,7 @@
 2. [Header Controls & Non-Obvious Global Actions](#2-header-controls--non-obvious-global-actions)
    - [Bilingual Toggle (`[🇲🇽 ES | 🇺🇸 EN]`) & URL Routing](#bilingual-toggle-es--en--url-routing)
    - [Live CSV / JSON Data Export](#live-csv--json-data-export)
-   - [Facebook Session & 2FA Setup (`Sesión FB`)](#facebook-session--2fa-setup-sesión-fb)
+   - [Facebook Session & 2FA Setup (`Sesión FB` / `LOGIN_FB_SESSION.bat`)](#facebook-session--2fa-setup-sesión-fb)
    - [Trigger Full Swarm (`Ejecutar Enjambre`)](#trigger-full-swarm-ejecutar-enjambre)
 3. [WhatsApp Vecinos Community Ingestion (Step-by-Step)](#3-whatsapp-vecinos-community-ingestion-step-by-step)
    - [Why This Sensor Matters](#why-this-sensor-matters)
@@ -26,18 +27,22 @@
    - [Origin Country Filters](#origin-country-filters)
    - [Submitting a New Wishlist Item](#submitting-a-new-wishlist-item)
 5. [🛒 Mercado Libre México (MLM) Intelligence Tab](#5--mercado-libre-méxico-mlm-intelligence-tab)
-   - [Real-Time Review Scraping & Mexican Failure Modes](#real-time-review-scraping--mexican-failure-modes)
+   - [Consumer Sales Velocity & What People Like](#consumer-sales-velocity--what-people-like-hot-new-products)
+   - [Critical Flaws, Failure Modes & What People DON'T Like](#critical-flaws-failure-modes--what-people-dont-like-13--defect-audits)
    - [Interpreting Product Cards & Defect Warnings](#interpreting-product-cards--defect-warnings)
-6. [Executive Daily Intelligence Reports Tab](#6-executive-daily-intelligence-reports-tab)
+6. [✨ Google Gemini 3.5 Flash-Lite Market Copilot (Tab 7)](#6--google-gemini-35-flash-lite-market-copilot-tab-7)
+   - [Conversational Grounding in Live SQLite Database](#conversational-grounding-in-live-sqlite-database)
+   - [Quick Prompt Suggestions & Research Commands](#quick-prompt-suggestions--research-commands)
+   - [Bilingual Strategic Research & Venture Ideation](#bilingual-strategic-research--venture-ideation)
+7. [Executive Daily Intelligence Reports Tab](#7-executive-daily-intelligence-reports-tab)
    - [Scope Selector: National vs. Mérida / Yucatán vs. Capital Cities](#scope-selector-national-vs-mérida--yucatán-vs-capital-cities)
    - [Downloading Raw Markdown Reports](#downloading-raw-markdown-reports)
-7. [Problem Explorer & Dataset Search](#7-problem-explorer--dataset-search)
+8. [Problem Explorer & Dataset Search](#8-problem-explorer--dataset-search)
    - [Multi-Filter Hierarchy](#multi-filter-hierarchy)
    - [Mexican Slang & Modismos Search](#mexican-slang--modismos-search)
-8. [Venture Opportunity Matrix](#8-venture-opportunity-matrix)
-9. [🤖 Agent Operations & Swarm Audit](#9--agent-operations--swarm-audit)
-   - [Individual Agent Re-execution](#individual-agent-re-execution)
-   - [Checking Ingestion Pipeline Health](#checking-ingestion-pipeline-health)
+9. [Venture Opportunity Matrix](#9-venture-opportunity-matrix)
+10. [🤖 Agent Operations & Swarm Audit](#10--agent-operations--swarm-audit)
+11. [CLI & Server Automation Cheat Sheet (Release 1.14)](#11-cli--server-automation-cheat-sheet-release-114)
 10. [CLI & Server Automation Cheat Sheet](#10-cli--server-automation-cheat-sheet)
 
 ---
@@ -271,7 +276,32 @@ When navigating to the **Informe Diario de Inteligencia** (Tab 1), scroll to **S
 
 ---
 
-## 6. Executive Daily Intelligence Reports Tab
+## 6. ✨ Google Gemini 3.5 Flash-Lite Market Copilot (Tab 7)
+
+Located in Tab 7: **`✨ Copiloto IA (Gemini 3.5 / Flash-Lite)`** (`tab-gemini`).
+
+### What It Is
+The platform integrates Google's official **Gemini 3.5 Flash-Lite** foundation model directly into the research workflow. Rather than a generic ChatGPT interface, this Copilot is **conversationally grounded in real-time** with your local SQLite database of Mexican consumer problems, hot Mercado Libre sales surges, and cross-border product voids.
+
+### How to Use the Copilot
+1. Click on Tab 7: **`✨ Copiloto IA (Gemini 3.5 / Flash-Lite)`**.
+2. Notice the live model indicator: `⚡ Modelo: gemini-3.5-flash-lite (Active)`.
+3. Type any research question or venture prompt in the chat input bar and hit **Enter** (or click **`Enviar ➔`**).
+4. **Quick Prompt Research Suggestions:** Click any of the four prompt pills above the feed to instantly run specialized analyses:
+   * **💧 Quejas de Sarro en Mérida:** Synthesizes limestone scale friction on water heaters, showers, and RO membranes from JAPAY water.
+   * **⚡ Apagones de CFE & Mercado Libre:** Identifies breakout demand surges for LiFePO4 batteries, surge protectors, and solar mini-splits during CFE heatwaves.
+   * **💼 Startup de Deshumidificadores:** Formulates a venture hypothesis for continuous gravity-drain dehumidifiers tailored to 90%+ coastal humidity.
+   * **🇺🇸 Oportunidades de Arbitraje USA:** Pinpoints missing US goods with high grey-market markups (Trader Joe's, OTC meds, compact dishwashers).
+
+### Conversational Grounding & Business Features
+* **Bilingual Execution:** Ask questions in Spanish or English; Gemini responds fluently in your language while understanding Mexican colloquialisms (*"broncas"*, *"transas"*, *"jineteo"*, *"pipas"*, *"bochorno"*).
+* **Venture Dossiers on Demand:** Ask the copilot to structure unit economics, regulatory roadmaps (NOM, COFEPRIS, CFE permits), and go-to-market strategies for any identified friction.
+* **Chat Memory & Reset:** Maintains conversational thread context. Click **`🗑️ Limpiar Chat`** to reset the conversation.
+* **REST API Endpoints:** Programmatic access available via `POST /api/gemini/chat`, `POST /api/gemini/synthesize`, and `GET /api/gemini/status`.
+
+---
+
+## 7. Executive Daily Intelligence Reports Tab
 
 Located in Tab 1: **`Informe Diario de Inteligencia`** (`tab-report`).
 
@@ -349,28 +379,39 @@ If you only want to scrape a specific data source without waiting for the full p
 
 ---
 
-## 10. CLI & Server Automation Cheat Sheet
+## 11. CLI & Server Automation Cheat Sheet (Release 1.14)
 
 For users managing or automating the platform outside the browser:
 
 ```powershell
 # 1. Start Web Dashboard Locally
 python run.py --web
-# (Opens http://localhost:8000/)
+# (Opens http://localhost:8000/ with Gemini 3.5 Copilot & MLM Explorer)
 
-# 2. Run Full Collection & Report Cycle
+# 2. Run Full Multi-Agent Collection & Report Cycle
 python run.py --all
 
-# 3. Interactive Facebook Headed Browser Setup
-python run.py --fb-login
+# 3. Interactive Facebook Headed Browser Session Capture
+LOGIN_FB_SESSION.bat
+# (Or CLI: python run.py --fb-login)
 
-# 4. Ingest WhatsApp Vecinos Sample via CLI
+# 4. Interactive Mercado Libre Session Verification
+LOGIN_ML_SESSION.bat
+# (Or CLI: python run.py --ml-login)
+
+# 5. Dual Mercado Libre Scraper
+python run.py --ml-hot         # Hot New Products & Breakout Trends
+python run.py --ml-problems    # Existing Products with 1-3 Star Defect Complaints
+python run.py --mercadolibre   # Full Dual Harvester
+
+# 6. Ingest WhatsApp Vecinos Sample via CLI
 python run.py --whatsapp
 
-# 5. Scrape Mercado Libre México via CLI
-python run.py --mercadolibre
-
-# 6. Export Database to Clean CSV & JSON
+# 7. Export Database to Clean CSV & JSON (Zero PII)
 python run.py --export
 # Stored in: data/exports/mexico_consumer_problems_latest.csv
+
+# 8. 1-Click Installers (Release 1.14)
+# Windows: INSTALL_RELEASE_1.14.bat
+# Linux/Server: ./install_release_1.14.sh
 ```

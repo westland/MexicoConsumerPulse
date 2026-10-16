@@ -1,7 +1,7 @@
 # 🇲🇽 MexConsumerPulse & Nuveen Grant - Master Project Memory & Operation Manual
 
 > **Archival Date:** October 16, 2026  
-> **Status:** Release 1.10 Production Live on [**https://pulse-mexico.com/**](https://pulse-mexico.com/) • Local Dashboard on `http://localhost:8000/` • GitHub Repo at [**https://github.com/westland/MexicoConsumerPulse**](https://github.com/westland/MexicoConsumerPulse)
+> **Status:** Release 1.14 Production Live on [**https://pulse-mexico.com/**](https://pulse-mexico.com/) • Local Dashboard on `http://localhost:8000/` • GitHub Repo at [**https://github.com/westland/MexicoConsumerPulse**](https://github.com/westland/MexicoConsumerPulse)
 
 ---
 
@@ -264,17 +264,59 @@ python run.py --export
 
 ---
 
-## 9. Final Project Closure & Verification Checklist
+---
+
+## 9. Release 1.14: Google Gemini 3.5 Flash-Lite Market Copilot & Session Automation
+
+### A. Gemini 3.5 Flash-Lite Conversational Integration
+* **Foundational LLM Engine ([`agents/gemini_agent.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/agents/gemini_agent.py)):**
+  * Connected to Google GenAI using the official `google-genai` SDK and model **`gemini-3.5-flash-lite`** (with automatic fallback to `gemini-3.5-flash`, `gemini-3.1-flash-lite`, and `gemini-2.5-flash-lite`).
+  * **Real-Time Data Grounding:** Automatically queries SQLite database before answering, injecting live context on:
+    * 🔥 Hot New Products & sales demand surges on Mercado Libre México.
+    * ⚠️ 1–3 star negative review complaints (Yucatán limestone scale, CFE surge burnouts, coastal humidity overflows).
+    * 🎁 Cross-border product voids and import wishlists.
+    * 🇲🇽 Mexican modismo and cultural vernacular mapping (*broncas, transas, jineteo, pipas, tandeo, bochorno*).
+* **REST Endpoints in [`app.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/app.py):**
+  * `POST /api/gemini/chat`: Handles grounded interactive Q&A and conversation history.
+  * `POST /api/gemini/synthesize`: Generates investor-grade startup theses, pricing in MXN, and regulatory roadmaps.
+  * `GET /api/gemini/status`: Reports active model and configuration status.
+* **Interactive UI Tab 7 ([`frontend/index.html`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/frontend/index.html), [`frontend/app.js`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/frontend/app.js)):**
+  * Tab 7: **`✨ Copiloto IA (Gemini 3.5 / Flash-Lite)`** with live model status badges.
+  * Quick research prompt pills (*💧 Quejas de Sarro en Mérida*, *⚡ Apagones de CFE & Mercado Libre*, *💼 Startup de Deshumidificadores*, *🇺🇸 Oportunidades de Arbitraje USA*).
+  * Glassmorphism chat feed with markdown parsing, code blocks, bullet points, and conversation reset.
+
+### B. 1-Click Interactive Session Launchers & Privacy Protection
+* **Dedicated Batch Launchers:**
+  * [`LOGIN_FB_SESSION.bat`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/LOGIN_FB_SESSION.bat): Directly launches Chromium headed browser on Windows for Facebook login, 2FA authorization, and group gatekeeper handling.
+  * [`LOGIN_ML_SESSION.bat`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/LOGIN_ML_SESSION.bat): Launches Chromium headed browser on Windows for Mercado Libre human verification / CAPTCHA solving.
+  * Robust path resolution logic allowing batch files to be double-clicked from the Windows `Desktop` or from the repository root.
+* **Menu Button Direct Integration:**
+  * Header button **`Sesión FB`** connects directly to `POST /api/agents/login/facebook` to launch `LOGIN_FB_SESSION.bat` on local machines.
+  * On remote cloud instances (`pulse-mexico.com`), displays an intelligent notice explaining why headless cloud servers cannot open desktop GUI windows and providing terminal/desktop instructions.
+* **Session Persistence & Security:**
+  * Captured cookies written to `data/auth_state/facebook_state.json`.
+  * Uploaded to Hetzner production server at `/opt/mexconsumerpulse/data/auth_state/`.
+  * Fully secured and ignored in [`.gitignore`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/.gitignore) (`data/auth_state/`, `.env`, `*.json_state`) guaranteeing zero credential leakage to GitHub.
+
+### C. Release 1.14 Installers
+* Windows: [`INSTALL_RELEASE_1.14.bat`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/INSTALL_RELEASE_1.14.bat)
+* Linux/macOS/Server: [`install_release_1.14.sh`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/install_release_1.14.sh)
+
+---
+
+## 10. Final Project Closure & Verification Checklist
 
 | Milestone | Status | Details / URL |
 |---|---|---|
 | **UIC Nuveen Grant Budget PDF** | ✅ Complete | Form filled itemized to $10,000 (`Nuveen_Grants_..._filled.pdf`) |
 | **Hetzner Cloud VPS Production** | ✅ Live | Running on `89.167.22.10`, HTTPS SSL on [https://pulse-mexico.com/](https://pulse-mexico.com/) |
-| **Release 1.00 Multi-Agent Swarm** | ✅ Active | 8 autonomous agents (Reddit, Twitter, Facebook, WhatsApp, Compliance, Synthesis, Reports, Product Voids) |
-| **Bilingual Support (ES/EN)** | ✅ Complete | Spanish default (`:8000`, `/`, `/es`), English (`/en`), header switcher |
-| **Dual Mercado Libre México Harvester** | ✅ Complete | Scrapes Hot New Products & Existing Product Quality Deficiencies with 1-3 star review extraction |
-| **Website Feature User Manual** | ✅ Complete | Fully documented in `USER_MANUAL.md` |
-| **GitHub Remote Synchronization** | ✅ Complete | All commits pushed up-to-date to `origin/main` (`westland/MexicoConsumerPulse`) |
+| **Google Gemini 3.5 Flash-Lite Copilot** | ✅ Active | Tab 7 conversational grounded copilot live locally and on [pulse-mexico.com](https://pulse-mexico.com/) |
+| **Dual Mercado Libre México Harvester** | ✅ Complete | Hot Products vs. 1-3 Star Complaints with verbatim buyer review quotes |
+| **1-Click Session Launchers** | ✅ Operational | `LOGIN_FB_SESSION.bat` & `LOGIN_ML_SESSION.bat` with desktop path resolution |
+| **Bilingual Support (ES/EN)** | ✅ Complete | Spanish default (`/`, `/es`), English (`/en`), header switcher |
+| **Website Feature User Manual** | ✅ Updated | Comprehensive guide updated to Release 1.14 in `USER_MANUAL.md` |
+| **Release 1.14 Installers** | ✅ Ready | `INSTALL_RELEASE_1.14.bat` & `install_release_1.14.sh` |
+| **GitHub Remote Synchronization** | ✅ Synced | Pushed up-to-date to `origin/main` ([westland/MexicoConsumerPulse](https://github.com/westland/MexicoConsumerPulse)) |
 
 
 

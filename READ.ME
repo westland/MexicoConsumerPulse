@@ -1,15 +1,16 @@
-# MexicoConsumerPulse 🇲🇽 (Release 1.10)
-### Autonomous Consumer Problem Intelligence, Cross-Border Product Voids & Dual Mercado Libre Harvester Swarm
+# MexicoConsumerPulse 🇲🇽 (Release 1.14)
+### Autonomous Consumer Problem Intelligence, Gemini 3.5 Copilot & Dual Mercado Libre Swarm
 
-[![Release](https://img.shields.io/badge/Release-v1.10-blue.svg)](https://github.com/westland/MexicoConsumerPulse/releases)
+[![Release](https://img.shields.io/badge/Release-v1.14-blue.svg)](https://github.com/westland/MexicoConsumerPulse/releases)
 [![Production](https://img.shields.io/badge/Live_Portal-pulse--mexico.com-green.svg)](https://pulse-mexico.com/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
 An end-to-end multi-agent market research and retail intelligence platform built to discover, scrape, sanitize, synthesize, and report on:
 1. **Daily Urban Consumer Friction & Service Voids** across major Mexican metropolitan zones (**Mérida & Yucatán, CDMX, Guadalajara, Monterrey, Puebla, Querétaro**) for both **Mexican Locals** and **Foreign Expats / Digital Nomads**.
-2. **Cross-Border Product Voids & "I Wish They Sold This in Mexico" Wishlists**: Autonomous harvesting of foreign consumer goods available in the **U.S., China, Japan, Korea, or Europe** that are missing in Mexico due to regulatory barriers (COFEPRIS, NOM certifications), high import tariffs, or lack of brand distribution.
-3. **Dual Mercado Libre México Harvester (`mercadolibre.com.mx`)**: Continuous monitoring of **🔥 Hot New Products & Breakout Trends** (LiFePO4 power stations, solar-direct ACs, IoT water sensors) paired with systematic auditing of **⚠️ Problems with Existing Products** (1–3 star critical reviews, Yucatán *sarro* calcification in <14 days, CFE power surge damage with soldered fuses, and 90%+ tropical humidity overflows).
+2. **✨ Google Gemini 3.5 Flash-Lite Grounded Market Copilot (Tab 7)**: Live conversational research assistant connecting Google's Gemini 3.5 Flash-Lite foundation model directly with the local Mexican SQLite database for real-time Q&A, startup ideation, and unit economics.
+3. **Cross-Border Product Voids & "I Wish They Sold This in Mexico" Wishlists**: Autonomous harvesting of foreign consumer goods available in the **U.S., China, Japan, Korea, or Europe** that are missing in Mexico due to regulatory barriers (COFEPRIS, NOM certifications), high import tariffs, or lack of brand distribution.
+4. **Dual Mercado Libre México Harvester (`mercadolibre.com.mx`)**: Continuous monitoring of **🔥 Hot New Products & Breakout Trends** (LiFePO4 power stations, solar-direct ACs, IoT water sensors) paired with systematic auditing of **⚠️ Problems with Existing Products** (1–3 star critical reviews, Yucatán *sarro* calcification in <14 days, CFE power surge damage with soldered fuses, and 90%+ tropical humidity overflows).
 
 * 🌐 **Live Cloud Production Portal:** [**https://pulse-mexico.com/**](https://pulse-mexico.com/)
 * 📚 **API Swagger Documentation:** [**https://pulse-mexico.com/docs**](https://pulse-mexico.com/docs)
@@ -18,23 +19,23 @@ An end-to-end multi-agent market research and retail intelligence platform built
 
 ---
 
-## ⚡ 1-Click Installation (Release 1.10)
+## ⚡ 1-Click Installation (Release 1.14)
 
 ### Windows
-Double-click [**`INSTALL_RELEASE_1.10.bat`**](INSTALL_RELEASE_1.10.bat) or run:
+Double-click [**`INSTALL_RELEASE_1.14.bat`**](INSTALL_RELEASE_1.14.bat) or run:
 ```cmd
-INSTALL_RELEASE_1.10.bat
+INSTALL_RELEASE_1.14.bat
 ```
 * Automatically configures Python virtual environment (`venv`).
-* Installs all requirements and headless Playwright Chromium.
+* Installs all requirements (`google-genai`, `fastapi`, `playwright`, etc.).
 * Seeds database with authentic consumer problems, cross-border product voids, and dual Mercado Libre México intelligence datasets.
 * Launches the interactive dashboard on `http://localhost:8000/`.
 
 ### Linux / macOS / Server
 Run the installer script:
 ```bash
-chmod +x install_release_1.10.sh
-./install_release_1.10.sh
+chmod +x install_release_1.14.sh
+./install_release_1.14.sh
 ```
 
 ### Docker Deployment
@@ -45,7 +46,23 @@ Runs `mexconsumerpulse_web` (FastAPI dashboard) and `mexconsumerpulse_scheduler`
 
 ---
 
-## 🔥 What's New in Release 1.10: Dual Mercado Libre Intelligence Swarm
+## ✨ What's New in Release 1.14: Google Gemini 3.5 Copilot & 1-Click Session Launchers
+
+Release 1.14 brings generative AI market synthesis and desktop session automation to the platform:
+
+### 1. Google Gemini 3.5 Flash-Lite Market Copilot (Tab 7)
+* **Real-Time Data Grounding:** The Copilot is directly connected to the local SQLite database, grounding every response in verified Mexican consumer complaints, trending Mercado Libre products, and product voids.
+* **Bilingual Strategy & VC Modeling:** Fluent in Mexican slang (*broncas, transas, jineteo, pipas, tandeo*) and capable of formulating instant unit economics, TAM/SAM sizing, and regulatory roadmaps (NOM, COFEPRIS, CFE).
+* **Interactive UI Feed:** Includes prompt pills (*Quejas de Sarro en Mérida*, *Apagones de CFE & Mercado Libre*, *Startup de Deshumidificadores*, *Arbitraje USA*) and conversation reset controls.
+
+### 2. 1-Click Headed Session Capture (`LOGIN_FB_SESSION.bat` & `LOGIN_ML_SESSION.bat`)
+* Direct desktop launchers for interactive browser login, 2FA authorization, and gatekeeper question handling.
+* Header button **`Sesión FB`** directly triggers `LOGIN_FB_SESSION.bat`.
+* Encrypted session tokens automatically persisted to `data/auth_state/` with `.gitignore` privacy protection.
+
+---
+
+## 🔥 Release 1.10 Features: Dual Mercado Libre Intelligence Swarm
 
 Release 1.10 introduces dual-target scraping and intelligence extraction exclusively tailored to **Mercado Libre México ([`mercadolibre.com.mx`](https://www.mercadolibre.com.mx/))**:
 
