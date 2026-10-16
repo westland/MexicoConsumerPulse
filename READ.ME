@@ -1,7 +1,7 @@
-# MexicoConsumerPulse 🇲🇽 (Release 1.00)
-### Autonomous Consumer Problem Intelligence, Cross-Border Product Voids & Multi-Agent Market Research Swarm
+# MexicoConsumerPulse 🇲🇽 (Release 1.10)
+### Autonomous Consumer Problem Intelligence, Cross-Border Product Voids & Dual Mercado Libre Harvester Swarm
 
-[![Release](https://img.shields.io/badge/Release-v1.00-blue.svg)](https://github.com/westland/MexicoConsumerPulse/releases)
+[![Release](https://img.shields.io/badge/Release-v1.10-blue.svg)](https://github.com/westland/MexicoConsumerPulse/releases)
 [![Production](https://img.shields.io/badge/Live_Portal-pulse--mexico.com-green.svg)](https://pulse-mexico.com/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-brightgreen.svg)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
@@ -9,30 +9,32 @@
 An end-to-end multi-agent market research and retail intelligence platform built to discover, scrape, sanitize, synthesize, and report on:
 1. **Daily Urban Consumer Friction & Service Voids** across major Mexican metropolitan zones (**Mérida & Yucatán, CDMX, Guadalajara, Monterrey, Puebla, Querétaro**) for both **Mexican Locals** and **Foreign Expats / Digital Nomads**.
 2. **Cross-Border Product Voids & "I Wish They Sold This in Mexico" Wishlists**: Autonomous harvesting of foreign consumer goods available in the **U.S., China, Japan, Korea, or Europe** that are missing in Mexico due to regulatory barriers (COFEPRIS, NOM certifications), high import tariffs, or lack of brand distribution.
+3. **Dual Mercado Libre México Harvester (`mercadolibre.com.mx`)**: Continuous monitoring of **🔥 Hot New Products & Breakout Trends** (LiFePO4 power stations, solar-direct ACs, IoT water sensors) paired with systematic auditing of **⚠️ Problems with Existing Products** (1–3 star critical reviews, Yucatán *sarro* calcification in <14 days, CFE power surge damage with soldered fuses, and 90%+ tropical humidity overflows).
 
 * 🌐 **Live Cloud Production Portal:** [**https://pulse-mexico.com/**](https://pulse-mexico.com/)
 * 📚 **API Swagger Documentation:** [**https://pulse-mexico.com/docs**](https://pulse-mexico.com/docs)
+* 📖 **Website User Manual & Feature Guide:** [**`USER_MANUAL.md`**](USER_MANUAL.md)
 * 🐙 **GitHub Repository:** [**https://github.com/westland/MexicoConsumerPulse**](https://github.com/westland/MexicoConsumerPulse)
 
 ---
 
-## ⚡ 1-Click Installation (Release 1.00)
+## ⚡ 1-Click Installation (Release 1.10)
 
 ### Windows
-Double-click [**`INSTALL_RELEASE_1.0.bat`**](INSTALL_RELEASE_1.0.bat) or run:
+Double-click [**`INSTALL_RELEASE_1.10.bat`**](INSTALL_RELEASE_1.10.bat) or run:
 ```cmd
-INSTALL_RELEASE_1.0.bat
+INSTALL_RELEASE_1.10.bat
 ```
 * Automatically configures Python virtual environment (`venv`).
 * Installs all requirements and headless Playwright Chromium.
-* Seeds database with authentic consumer problem and cross-border product void intelligence.
+* Seeds database with authentic consumer problems, cross-border product voids, and dual Mercado Libre México intelligence datasets.
 * Launches the interactive dashboard on `http://localhost:8000/`.
 
 ### Linux / macOS / Server
 Run the installer script:
 ```bash
-chmod +x install_release_1.0.sh
-./install_release_1.0.sh
+chmod +x install_release_1.10.sh
+./install_release_1.10.sh
 ```
 
 ### Docker Deployment
@@ -43,10 +45,37 @@ Runs `mexconsumerpulse_web` (FastAPI dashboard) and `mexconsumerpulse_scheduler`
 
 ---
 
-## 🎁 What's New in Release 1.00: Product Voids & Retail Arbitrage
+## 🔥 What's New in Release 1.10: Dual Mercado Libre Intelligence Swarm
 
-Release 1.00 introduces specialized natural language scrapers and synthesis engines tracking consumer expressions of:
+Release 1.10 introduces dual-target scraping and intelligence extraction exclusively tailored to **Mercado Libre México ([`mercadolibre.com.mx`](https://www.mercadolibre.com.mx/))**:
+
+### 1. Hot New Products & Breakout Trends
+* **LiFePO4 Portable Power Stations (1024Wh / 1200W):** Surged +420% in searches during CFE summer grid heatwave blackouts in Monterrey, CDMX, and Mérida.
+* **Solar-Direct Hybrid Inverter Mini-Splits (1.5 Ton):** Connects straight to 3 rooftop DC panels, bypassing CFE DAC high-consumption penalty electric tariffs.
+* **6-Stage Reverse Osmosis Purifiers with Booster Pump:** Removes 99% limestone *sarro* from deep wells and municipal water in Mérida and Querétaro.
+* **Ultrasonic IoT Cistern & Tinaco Level Sensors:** Surged +510% during CDMX Cutzamala water rationing to protect pumps from running dry.
+* **Compact Countertop Portable Dishwashers (5L tank):** Solves rental apartment friction where kitchens lack 60cm rough-in plumbing.
+* **Ultra-Fast Portable Ice Makers (12 kg/24h):** High demand during 44°C heatwaves when convenience stores run out of bagged ice.
+
+### 2. Problems with Existing Products (1–3 ⭐ Critical Complaints)
+* **Yucatán Hard Limestone Water (*Sarro*):** Ceramic water filters clogging within 14 days due to JAPAY's high mineral hardness.
+* **CFE Voltage Spikes & Compressor Failures:** Internal soldered thermal fuses blowing in 2000VA voltage regulators with zero local replacement parts in Mexico.
+* **Tropical Coastal Humidity:** Standard 2-liter tank dehumidifiers overflowing within 3.5 hours under 90%+ relative humidity while heating rooms by 3°C.
+* **Solar & Booster Pump Incompatibilities:** Calentador solar vacuum tubes broken by hailstorms, short magnesium sacrificial anodes corroding in 3 months, and flow switch calcification on booster pumps.
+
+### 3. Interactive Dashboard Controls
+* Sub-tab filter pills: `Todos los Artículos`, `🔥 Hot New Products & Tendencias`, and `⚠️ Fallas en Productos Existentes (1-3 ⭐)`.
+* Category dropdown filter (Energy/CFE, Water/Sarro, Tropical Climate, Appliances, Smart Home, Plumbing).
+* Visual differentiation on cards with verbatim Mexican buyer review quotes and venture redesign hypotheses.
+* CLI support: `python run.py --ml-hot`, `python run.py --ml-problems`, `python run.py --ml-login`.
+
+---
+
+## 🎁 Release 1.00 Features: Product Voids & Retail Arbitrage
+
+Release 1.00 natural language scrapers and synthesis engines tracking consumer expressions of:
 > *"Ojalá vendieran esto en México..."* | *"Por qué no hay en México..."* | *"Mandar a traer del gabacho..."* | *"Me lo retuvo la aduana..."*
+
 
 ### Tracked Product Voids & Missing Goods
 * **Countertop Compact Dishwashers (Hava, Farberware):** High demand in small CDMX/Roma apartments; blocked by Mexican retail stocking only 24" full-size units and NOM energy certification customs deposits.
@@ -71,6 +100,7 @@ c:\Users\chris\Desktop\Market Research Mexico\
 ├── deploy_hetzner.sh         # One-click automated installer for Hetzner Cloud Linux servers
 ├── Dockerfile                # Production Docker image with headless Playwright Chromium
 ├── docker-compose.yml        # Docker Compose configuration (Web UI + Daily Scheduler)
+├── USER_MANUAL.md            # Complete website user manual & non-obvious feature guide
 ├── HETZNER_DEPLOYMENT_GUIDE.md # Complete Hetzner VPS setup manual
 ├── hetzner/                  # Production systemd services and Nginx SSL configuration
 ├── requirements.txt          # Python dependencies
