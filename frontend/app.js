@@ -358,7 +358,25 @@ function initModals() {
   const openModal = () => fbModal && fbModal.classList.add("active");
   const closeModal = () => fbModal && fbModal.classList.remove("active");
 
-  if (btnFbSession) btnFbSession.addEventListener("click", openModal);
+  if (btnFbSession) {
+    btnFbSession.addEventListener("click", () => {
+      showToast(currentLang === "es" ? "Iniciando LOGIN_FB_SESSION.bat..." : "Launching LOGIN_FB_SESSION.bat...");
+      fetch("/api/agents/login/facebook", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === "cloud_notice") {
+            // Browsing on remote cloud VPS: open modal with instructions
+            openModal();
+          } else {
+            // Local machine: batch file & browser popped open!
+            showToast(currentLang === "es" ? "🚀 ¡LOGIN_FB_SESSION.bat iniciado! La ventana de Chrome se abrirá en tu pantalla." : "🚀 LOGIN_FB_SESSION.bat started! Chrome window opening on your desktop.");
+          }
+        })
+        .catch(err => {
+          openModal();
+        });
+    });
+  }
   if (btnClose) btnClose.addEventListener("click", closeModal);
   if (btnCancel) btnCancel.addEventListener("click", closeModal);
 

@@ -430,15 +430,28 @@ def launch_interactive_login(service: str):
         }
 
     # Running locally on user's machine (Windows/Mac/Linux with GUI)
-    flag = "--fb-login" if service == "facebook" else "--ml-login"
+    bat_file = BASE_DIR / ("LOGIN_FB_SESSION.bat" if service == "facebook" else "LOGIN_ML_SESSION.bat")
     try:
-        proc = subprocess.Popen([sys.executable, str(BASE_DIR / "run.py"), flag])
-        return {
-            "status": "launched",
-            "service": service,
-            "message": f"Ventana de Google Chrome / Chromium abierta exitosamente en tu escritorio para {service.capitalize()}.",
-            "pid": proc.pid
-        }
+        if sys.platform == "win32" and bat_file.exists():
+            try:
+                os.startfile(str(bat_file))
+            except Exception:
+                subprocess.Popen(["cmd.exe", "/c", "start", "", str(bat_file)], shell=True)
+            return {
+                "status": "launched",
+                "service": service,
+                "launcher": bat_file.name,
+                "message": f"Iniciando {bat_file.name}. Se abrirá una ventana de Chromium en tu pantalla.",
+            }
+        else:
+            flag = "--fb-login" if service == "facebook" else "--ml-login"
+            proc = subprocess.Popen([sys.executable, str(BASE_DIR / "run.py"), flag])
+            return {
+                "status": "launched",
+                "service": service,
+                "message": f"Ventana de Google Chrome / Chromium abierta exitosamente en tu escritorio para {service.capitalize()}.",
+                "pid": proc.pid
+            }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to launch headed browser: {e}")
 
