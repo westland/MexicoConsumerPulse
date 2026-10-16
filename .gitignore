@@ -46,6 +46,8 @@ Nuveen*
 .env
 *.env
 .env.*
+data/auth_state/
+*.json_state
 
 # Hetzner temporary scratch
 hetzner/askpass*
