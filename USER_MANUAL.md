@@ -192,26 +192,68 @@ Users and market researchers can directly expand the product void database from 
 
 Located in Tab 6: **`🛒 Mercado Libre México`** (`tab-mercadolibre`).
 
-### Dual Intelligence Engine: Hot Products vs. Existing Product Flaws
-The Mercado Libre México agent operates with a dual focus designed to inform cross-border founders, manufacturers, and e-commerce operators:
-1. **🔥 Hot New Products & Breakout Trends:** Tracks high-velocity items, best-seller badges, and demand surges responding to structural Mexican needs (e.g., LiFePO4 portable power stations for CFE grid outages, solar-direct mini-splits that avoid high-consumption DAC electric tariffs, ultrasonic IoT cistern/tinaco switches for water cutoffs, and compact countertop dishwashers for urban apartments).
-2. **⚠️ Problems with Existing Products (1–3 ⭐ Reviews):** Systematically audits customer complaints and returns caused by local conditions:
-   * **Mérida & Yucatán Limestone (*Sarro*):** Water filters and appliances clogging within 14 days due to JAPAY's high calcification levels.
-   * **CFE Summer Voltage Surges:** Inverters and refrigerator surge protectors burning out thermal fuses during 45°C heatwaves with unreplaceable soldered parts.
-   * **Tropical Coastal Humidity:** Standard 2-liter tank dehumidifiers overflowing within 3.5 hours under 90%+ relative humidity while heating rooms by 3°C.
-   * **Plumbing & Solar Incompatibilities:** Calentador solar vacuum tubes broken by hailstorms, short magnesium sacrificial anodes causing premature tank pitting, and flow switch calcification on booster pumps.
+### Where to Find Mercado Libre Sales, Products & Sentiment in the App
+The platform tracks real-time consumer sales trends, product velocity, and user sentiment across multiple core areas of the application:
+1. **The Interactive MLM Dashboard (Tab 6):** The primary visual interface featuring live statistics, category filtering, sales velocity indicators, and sentiment cards.
+2. **The Executive Daily Intelligence Report (Tab 1, Section 7):** Formatted executive summaries broken down into *Section 7.1 (Sales Velocity & Breakout Trends)* and *Section 7.2 (Critical Flaws & 1–3 Star Complaints)*.
+3. **The REST API (`/api/mercadolibre/*`):** Structured JSON endpoints providing real-time sales growth metrics, buyer quotes, and failure modes for programmatic consumption.
+4. **The Swarm Harvester CLI (`python run.py --ml-*`):** Autonomous background crawling updating the sales and review database on demand.
 
-### Filter Controls & View Modes
-Use the interactive filter bar at the top of the tab:
-* **`Todos los Artículos` (`All Products`):** Full consolidated view of both hot items and defect audits.
-* **`🔥 Hot New Products & Tendencias`:** Isolates breakout products with demand acceleration percentages (e.g., `+420% búsquedas durante apagones`).
-* **`⚠️ Fallas en Productos Existentes (1–3 ⭐)`:** Filters directly to critical defect alerts, failure modes, and customer complaint quotes.
-* **Categoría (Category Selector):** Drill down into *Energía y Red CFE*, *Agua y Sarro*, *Clima y Humedad Tropical*, *Electrodomésticos y Departamentos*, *Smart Home y Automatización*, or *Plomería e Hidráulica*.
+---
 
-### Interpreting Product Cards
-* **🔥 Hot Product Cards (`ml-card-hot`):** Highlighted with orange/amber accents, flame badges (`🔥 MÁS VENDIDO #1`, `⚡ TENDENCIA VIRAL`), green demand acceleration tags, adoption drivers in Mexico, verified buyer satisfaction feedback, and D2C scaling venture opportunities.
-* **⚠️ Problem Product Cards (`ml-card-problem`):** Highlighted with crimson red accents, alert badges (`⚠️ FALLA REGIONAL DE SARRO`, `🔌 QUEMADO POR VARIACIÓN CFE`), technical failure mode banners, verbatim 1–3 star buyer review callouts, and product redesign venture hypotheses.
-* **Direct MLM Link:** Click **`Ver Artículo en Mercado Libre ↗`** to inspect the live product page on `mercadolibre.com.mx`.
+### Consumer Sales Velocity & What People Like (🔥 Hot New Products)
+
+To see what products are currently experiencing explosive sales in Mexico and **what consumers love about them**:
+1. Click the **`🔥 Hot New Products & Tendencias`** filter pill at the top of Tab 6.
+2. Review the product cards (`ml-card-hot`), accented in amber and gold.
+3. **Consumer Sales & Demand Indicators:**
+   * **Sales Badges:** Track badges like `🔥 MÁS VENDIDO #1`, `⚡ TENDENCIA VIRAL`, and `📈 VENTAS EN ALZA`.
+   * **Demand Growth Metrics:** Look for green percentage spikes detailing sales catalysts (e.g., `+420% búsquedas durante apagones CFE` or `+510% durante cortes Cutzamala`).
+   * **Pricing in MXN:** Real-time pricing indicating consumer willingness-to-pay (e.g., `$13,499 MXN` for portable power stations, `$1,890 MXN` for cistern sensors).
+   * **Estimated Sales Volume:** Signals monthly retail velocity on `mercadolibre.com.mx`.
+4. **What People Like (Adoption Drivers & Strengths):**
+   * **High Star Ratings:** Displays customer satisfaction levels (typically 4.7 ⭐ to 4.9 ⭐).
+   * **`¿Por qué gusta a los mexicanos?` (Adoption Catalyst):** Highlights exact buyer praise explaining why the product is succeeding (e.g., *Keeps home Wi-Fi and CPAP running silently for 14 hours during heatwave blackouts with zero gasoline fumes*; *Direct DC solar connection bypasses expensive CFE DAC tariff brackets without requiring grid tie-in permits*; *Fits into tight Condesa/Roma rental kitchens with no rough-in plumbing alterations required*).
+   * **Oportunidad de Escalamiento / Venture Hypothesis:** Strategic business model recommendations for founders and e-commerce operators to import, bundle, or localize these products.
+
+---
+
+### Critical Flaws, Failure Modes & What People DON'T Like (⚠️ 1–3 ⭐ Defect Audits)
+
+To see which products are failing in the Mexican market, experiencing high return rates, or **what buyers dislike and complain about**:
+1. Click the **`⚠️ Fallas en Productos Existentes (1–3 ⭐)`** filter pill at the top of Tab 6.
+2. Review the problem cards (`ml-card-problem`), accented in alert crimson.
+3. **Negative Review & Defect Metrics:**
+   * **Depressed Star Ratings:** Pinpoints poorly reviewed listings averaging 1.8 ⭐ to 2.6 ⭐.
+   * **Failure Mode Header:** Clearly identifies the root engineering or structural failure (e.g., `Falla: Obstrucción por carbonato de calcio kárstico en <14 días`, `Falla: Fusible térmico interno soldado no reemplazable`, `Falla: Desbordamiento por humedad relativa >90% en costa`).
+4. **What People DON'T Like (Verbatim Mexican Buyer Quotes):**
+   * **Verbatim Reviews:** Every problem card displays authentic 1–3 star customer complaints extracted from Mexican buyers on Mercado Libre, highlighting recurring frustrations:
+     > *"En Mérida el agua tiene tanto sarro que la membrana de cerámica se tapó por completo a los 12 días; la lavé con vinagre como dice el manual y no sirvió para nada."*
+     > *"Con el primer apagón de CFE en Monterrey tronó el regulador. Al abrirlo vi que el fusible viene soldado a la placa y no hay refacción en México."*
+     > *"Vivo en Progreso y el tanque de 2 litros se llena en 3 horas y media. Si sales a trabajar se desborda y además calienta la recámara 3 grados."*
+   * **Hypothesis for Product Redesign:** Provides actionable engineering fixes (e.g., swapping standard membranes for ion-exchange resin pre-filters, introducing external replaceable slow-blow fuses, or designing continuous gravity-drain hoses with thermoelectric Peltier cooling).
+
+---
+
+### Filter Controls & View Modes in the App
+* **`Todos los Artículos` (`All Products`):** Consolidated view comparing hot winners alongside flawed products side-by-side.
+* **`🔥 Hot New Products & Tendencias`:** Isolates breakout sales leaders.
+* **`⚠️ Fallas en Productos Existentes (1–3 ⭐)`:** Isolates negative review defect audits.
+* **Categoría (Category Selector):** Drill down into:
+  - *⚡ Energía y Red CFE* (Power stations, regulators, inverters)
+  - *💧 Agua y Sarro* (Purifiers, softeners, water pumps)
+  - *🌴 Clima y Humedad Tropical* (Dehumidifiers, solar mini-splits)
+  - *🍳 Electrodomésticos y Departamentos* (Countertop dishwashers, ice makers)
+  - *📱 Smart Home y Automatización* (Cistern level sensors, smart relays)
+  - *🔧 Plomería e Hidráulica* (Solar heaters, booster pump flow switches)
+* **Direct MLM Verification Link:** Click **`Ver Artículo en Mercado Libre ↗`** on any card to navigate directly to the product on `mercadolibre.com.mx`.
+
+---
+
+### Mercado Libre Data in the Executive Report (Tab 1)
+When navigating to the **Informe Diario de Inteligencia** (Tab 1), scroll to **Sección 7: Inteligencia Minorista de Mercado Libre México**:
+* **Sección 7.1 (Hot Products & Ventas):** Provides executive bullet points on sales velocity surges, top trending ASINs/categories, and key consumer satisfaction drivers.
+* **Sección 7.2 (Fallas Críticas y Reseñas Negativas):** Synthesizes negative review patterns, regional failure breakdowns (Yucatán limestone, Northern grid fluctuations), and specific buyer quotes for investor-grade diligence.
 
 ---
 
