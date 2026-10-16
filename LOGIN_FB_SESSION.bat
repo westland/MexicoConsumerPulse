@@ -19,7 +19,14 @@ echo.
 echo Iniciando navegador...
 echo.
 
-cd /d "%~dp0"
+if exist "%~dp0run.py" (
+    cd /d "%~dp0"
+) else if exist "%~dp0Market Research Mexico\run.py" (
+    cd /d "%~dp0Market Research Mexico"
+) else if exist "C:\Users\chris\Desktop\Market Research Mexico\run.py" (
+    cd /d "C:\Users\chris\Desktop\Market Research Mexico"
+)
+
 python run.py --fb-login
 
 echo.
