@@ -255,14 +255,33 @@ class DatasetManager:
             "total_exported": len(problems)
         }
 
-    def get_mercadolibre_products(self, limit: int = 50) -> List[Dict[str, Any]]:
-        """Retrieve all scraped Mercado Libre products with review breakdowns."""
+    def get_mercadolibre_products(self, product_type: Optional[str] = None, category: Optional[str] = None, limit: int = 50) -> List[Dict[str, Any]]:
+        """Retrieve all scraped Mercado Libre products with review breakdowns, optionally filtered by product_type and category."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='mercadolibre_products'")
             if not cursor.fetchone():
                 return []
-            cursor.execute("SELECT * FROM mercadolibre_products ORDER BY rating ASC, id DESC LIMIT ?", (limit,))
+            
+            query = "SELECT * FROM mercadolibre_products"
+            params = []
+            conditions = []
+
+            if product_type and product_type != "ALL":
+                conditions.append("product_type = ?")
+                params.append(product_type)
+
+            if category and category != "ALL":
+                conditions.append("category = ?")
+                params.append(category)
+
+            if conditions:
+                query += " WHERE " + " AND ".join(conditions)
+
+            query += " ORDER BY id DESC LIMIT ?"
+            params.append(limit)
+
+            cursor.execute(query, tuple(params))
             rows = cursor.fetchall()
             output = []
             for r in rows:
@@ -273,6 +292,14 @@ class DatasetManager:
                     d["reviews"] = []
                 output.append(d)
             return output
+
+    def get_mercadolibre_hot_products(self, limit: int = 50) -> List[Dict[str, Any]]:
+        """Retrieve only hot new products and breakout trends in Mexico."""
+        return self.get_mercadolibre_products(product_type="HOT_NEW_PRODUCT", limit=limit)
+
+    def get_mercadolibre_problem_products(self, limit: int = 50) -> List[Dict[str, Any]]:
+        """Retrieve only products with critical failures, quality complaints, and 1-3 star reviews."""
+        return self.get_mercadolibre_products(product_type="EXISTING_PRODUCT_PROBLEMS", limit=limit)
 
     def seed_product_voids(self) -> int:
         """

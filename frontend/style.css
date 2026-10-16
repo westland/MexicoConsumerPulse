@@ -1019,3 +1019,107 @@ body {
   gap: 20px;
 }
 
+/* Dual Harvester Filter Bar & Badges */
+.ml-filter-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.ml-pill-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ml-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ml-pill-btn.active {
+  background: rgba(255, 230, 0, 0.15);
+  border-color: #ffe600;
+  color: #ffe600;
+  box-shadow: 0 0 14px rgba(255, 230, 0, 0.2);
+}
+
+.ml-pill-btn.active.hot-filter {
+  background: rgba(255, 87, 34, 0.2);
+  border-color: #ff5722;
+  color: #ff7043;
+  box-shadow: 0 0 14px rgba(255, 87, 34, 0.25);
+}
+
+.ml-pill-btn.active.problem-filter {
+  background: rgba(255, 71, 87, 0.2);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  box-shadow: 0 0 14px rgba(255, 71, 87, 0.25);
+}
+
+.ml-badge-hot {
+  background: linear-gradient(135deg, rgba(255, 87, 34, 0.25), rgba(255, 152, 0, 0.25));
+  border: 1px solid rgba(255, 87, 34, 0.5);
+  color: #ff9800;
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ml-badge-problem {
+  background: rgba(255, 71, 87, 0.15);
+  border: 1px solid rgba(255, 71, 87, 0.4);
+  color: var(--accent-red);
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ml-card-hot {
+  border-top: 3px solid #ff9800 !important;
+  background: radial-gradient(circle at top right, rgba(255, 152, 0, 0.05), transparent 70%), rgba(16, 22, 34, 0.65) !important;
+}
+
+.ml-card-problem {
+  border-top: 3px solid var(--accent-red) !important;
+  background: radial-gradient(circle at top right, rgba(255, 71, 87, 0.05), transparent 70%), rgba(16, 22, 34, 0.65) !important;
+}
+
+.ml-growth-tag {
+  background: rgba(0, 230, 153, 0.1);
+  border: 1px solid rgba(0, 230, 153, 0.3);
+  color: var(--accent-green);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+

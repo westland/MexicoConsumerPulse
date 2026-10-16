@@ -27,7 +27,10 @@ def main():
     parser.add_argument("--twitter", action="store_true", help="Run Twitter/X Complaint Agent")
     parser.add_argument("--facebook", action="store_true", help="Run Facebook Groups Browser Agent")
     parser.add_argument("--whatsapp", action="store_true", help="Parse WhatsApp 'Chat de Vecinos' community stream")
-    parser.add_argument("--mercadolibre", action="store_true", help="Scrape product reviews and details from Mercado Libre México (mercadolibre.com.mx)")
+    parser.add_argument("--mercadolibre", action="store_true", help="Scrape hot new products and existing product problems from Mercado Libre México (mercadolibre.com.mx)")
+    parser.add_argument("--ml-hot", action="store_true", help="Scrape and extract Hot New Products and emerging breakout trends on Mercado Libre México")
+    parser.add_argument("--ml-problems", action="store_true", help="Scrape and extract Problems with Existing Products (critical complaints, 1-3 star reviews) on Mercado Libre México")
+    parser.add_argument("--ml-login", action="store_true", help="Launch interactive headed browser for Mercado Libre México session capture / human verification")
     parser.add_argument("--fb-login", action="store_true", help="Launch interactive headed browser for Facebook login / 2FA session capture")
     parser.add_argument("--report", action="store_true", help="Generate Daily Intelligence Report only")
     parser.add_argument("--export", action="store_true", help="Export SQLite database to CSV and JSON")
@@ -36,7 +39,7 @@ def main():
     args = parser.parse_args()
 
     # Default to --all if no specific arguments provided
-    if not any([args.all, args.reddit, args.twitter, args.facebook, args.whatsapp, args.mercadolibre, args.fb_login, args.report, args.export, args.web]):
+    if not any([args.all, args.reddit, args.twitter, args.facebook, args.whatsapp, args.mercadolibre, args.ml_hot, args.ml_problems, args.ml_login, args.fb_login, args.report, args.export, args.web]):
         args.all = True
 
     print("=" * 70)
@@ -57,6 +60,12 @@ def main():
     if args.fb_login:
         fb_agent = FacebookBrowserAgent()
         fb_agent.interactive_login()
+        return
+
+    # 1b. Interactive Mercado Libre Session Capture
+    if args.ml_login:
+        ml_agent = MercadoLibreAgent()
+        ml_agent.interactive_session()
         return
 
     # 2. Reddit Agent
@@ -99,13 +108,24 @@ def main():
         except Exception as e:
             print(f" [Error] WhatsApp Agent failed: {e}")
 
-    # 6. Mercado Libre Mexico Product Reviews & Details Scraper Agent
-    if args.all or args.mercadolibre:
-        print("\n[Stage 5/6] Invoking Mercado Libre México Product Reviews & Details Agent...")
+    # 6. Mercado Libre Mexico Dual Intelligence Agent (Hot Products + Existing Product Problems)
+    if args.all or args.mercadolibre or args.ml_hot or args.ml_problems:
+        print("\n[Stage 5/6] Invoking Mercado Libre México Intelligence Agent...")
         try:
             ml_agent = MercadoLibreAgent()
-            ml_res = agent_run = ml_agent.run()
-            print(f" -> Completed: Harvested {ml_res['total_collected']} products and reviews from https://www.mercadolibre.com.mx/")
+            if args.ml_hot and not args.all:
+                hot_items = ml_agent.get_hot_new_products()
+                print(f" -> Displaying {len(hot_items)} Hot New Products & Breakout Trends on mercadolibre.com.mx:")
+                for item in hot_items:
+                    print(f"    * [{item.get('trend_badge')}] {item['title']} - ${item['price_mxn']:,.0f} MXN ({item.get('demand_growth')})")
+            elif args.ml_problems and not args.all:
+                problem_items = ml_agent.get_product_problems()
+                print(f" -> Displaying {len(problem_items)} Existing Products with Severe Failure Modes & Complaints on mercadolibre.com.mx:")
+                for item in problem_items:
+                    print(f"    ! [{item.get('failure_mode')}] {item['title']} - Rating: {item['rating']}/5 ({len(item.get('reviews', []))} reviews)")
+            else:
+                ml_res = ml_agent.run()
+                print(f" -> Completed: Harvested {ml_res['total_collected']} items ({ml_res.get('hot_new_products_count', 0)} Hot New Products, {ml_res.get('product_problems_count', 0)} Product Problems) from https://www.mercadolibre.com.mx/")
         except Exception as e:
             print(f" [Error] Mercado Libre Agent failed: {e}")
 

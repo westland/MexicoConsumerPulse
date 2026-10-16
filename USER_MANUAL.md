@@ -192,20 +192,26 @@ Users and market researchers can directly expand the product void database from 
 
 Located in Tab 6: **`🛒 Mercado Libre México`** (`tab-mercadolibre`).
 
-### Real-Time Review Scraping & Mexican Failure Modes
-Unlike general e-commerce reviews, this agent strictly monitors items sold on **`mercadolibre.com.mx`** to identify how Mexican physical infrastructure causes product returns and complaints:
-* **Mérida & Yucatan Karstic Limestone (*Sarro*):** Water filters and espresso machines failing within 14 days because water supplied by JAPAY contains extreme mineral hardness.
-* **CFE Summer Voltage Surges:** Inverters and refrigerator surge protectors burning out thermal fuses during 45°C heatwaves in Monterrey and Hermosillo.
-* **Tropical Humidity:** Standard 2-liter tank dehumidifiers overflowing within 3 hours under coastal Yucatán's 90%+ relative humidity.
+### Dual Intelligence Engine: Hot Products vs. Existing Product Flaws
+The Mercado Libre México agent operates with a dual focus designed to inform cross-border founders, manufacturers, and e-commerce operators:
+1. **🔥 Hot New Products & Breakout Trends:** Tracks high-velocity items, best-seller badges, and demand surges responding to structural Mexican needs (e.g., LiFePO4 portable power stations for CFE grid outages, solar-direct mini-splits that avoid high-consumption DAC electric tariffs, ultrasonic IoT cistern/tinaco switches for water cutoffs, and compact countertop dishwashers for urban apartments).
+2. **⚠️ Problems with Existing Products (1–3 ⭐ Reviews):** Systematically audits customer complaints and returns caused by local conditions:
+   * **Mérida & Yucatán Limestone (*Sarro*):** Water filters and appliances clogging within 14 days due to JAPAY's high calcification levels.
+   * **CFE Summer Voltage Surges:** Inverters and refrigerator surge protectors burning out thermal fuses during 45°C heatwaves with unreplaceable soldered parts.
+   * **Tropical Coastal Humidity:** Standard 2-liter tank dehumidifiers overflowing within 3.5 hours under 90%+ relative humidity while heating rooms by 3°C.
+   * **Plumbing & Solar Incompatibilities:** Calentador solar vacuum tubes broken by hailstorms, short magnesium sacrificial anodes causing premature tank pitting, and flow switch calcification on booster pumps.
 
-### Interpreting Product Cards & Defect Warnings
-Each card in this tab highlights actionable product design intelligence:
-* **MLM ID Badge:** The internal Mercado Libre Mexico publication code (e.g., `MLM-948271034`).
-* **MXN Pricing & Seller Location:** Shows domestic pricing in Mexican pesos, whether it has *Envío Full*, and if it ships from CDMX, Jalisco, or Nuevo León.
-* **Falla Regional Crítica (Red Alert Box):** Summarizes the engineering or infrastructural cause of dissatisfaction in Mexico.
-* **Reseñas Reales (Buyer Quotes):** Verbatim quotes from Mexican buyers detailing installation headaches or unexpected expenses (e.g., needing to buy 1/2" plumbing adapters not included in foreign packaging).
-* **Oportunidad de Emprendimiento (Yellow Box):** How a local hardware brand or distributor can manufacture a "tropicalized" version that solves this problem.
-* **Direct MLM Link:** Click **`Ver Artículo en Mercado Libre ↗`** to inspect the live product page.
+### Filter Controls & View Modes
+Use the interactive filter bar at the top of the tab:
+* **`Todos los Artículos` (`All Products`):** Full consolidated view of both hot items and defect audits.
+* **`🔥 Hot New Products & Tendencias`:** Isolates breakout products with demand acceleration percentages (e.g., `+420% búsquedas durante apagones`).
+* **`⚠️ Fallas en Productos Existentes (1–3 ⭐)`:** Filters directly to critical defect alerts, failure modes, and customer complaint quotes.
+* **Categoría (Category Selector):** Drill down into *Energía y Red CFE*, *Agua y Sarro*, *Clima y Humedad Tropical*, *Electrodomésticos y Departamentos*, *Smart Home y Automatización*, or *Plomería e Hidráulica*.
+
+### Interpreting Product Cards
+* **🔥 Hot Product Cards (`ml-card-hot`):** Highlighted with orange/amber accents, flame badges (`🔥 MÁS VENDIDO #1`, `⚡ TENDENCIA VIRAL`), green demand acceleration tags, adoption drivers in Mexico, verified buyer satisfaction feedback, and D2C scaling venture opportunities.
+* **⚠️ Problem Product Cards (`ml-card-problem`):** Highlighted with crimson red accents, alert badges (`⚠️ FALLA REGIONAL DE SARRO`, `🔌 QUEMADO POR VARIACIÓN CFE`), technical failure mode banners, verbatim 1–3 star buyer review callouts, and product redesign venture hypotheses.
+* **Direct MLM Link:** Click **`Ver Artículo en Mercado Libre ↗`** to inspect the live product page on `mercadolibre.com.mx`.
 
 ---
 

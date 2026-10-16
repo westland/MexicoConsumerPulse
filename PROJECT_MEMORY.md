@@ -1,7 +1,7 @@
 # 🇲🇽 MexConsumerPulse & Nuveen Grant - Master Project Memory & Operation Manual
 
-> **Archival Date:** October 15, 2026  
-> **Status:** Release 1.00 Production Live on [**https://pulse-mexico.com/**](https://pulse-mexico.com/) • Local Dashboard on `http://localhost:8000/` • GitHub Repo & Release 1.00 at [**https://github.com/westland/MexicoConsumerPulse**](https://github.com/westland/MexicoConsumerPulse)
+> **Archival Date:** October 16, 2026  
+> **Status:** Release 1.10 Production Live on [**https://pulse-mexico.com/**](https://pulse-mexico.com/) • Local Dashboard on `http://localhost:8000/` • GitHub Repo at [**https://github.com/westland/MexicoConsumerPulse**](https://github.com/westland/MexicoConsumerPulse)
 
 ---
 
@@ -223,7 +223,48 @@ python run.py --export
 
 ---
 
-## 8. Final Project Closure & Verification Checklist
+## 8. Release 1.10: Dual Mercado Libre México Agent (Hot Products & Existing Product Flaws)
+
+* **Dual Scraping & Intelligence Mission:**
+  * Updated [`agents/mercadolibre_agent.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/agents/mercadolibre_agent.py) to target both **Hot New Products** (breakout velocity, high demand, best sellers) and **Problems with Existing Products** (critical 1–3 star customer complaints, regional failure modes in Mexico).
+  * **Hot New Products Tracked**:
+    1. *LiFePO4 Portable Power Stations (1024Wh / 1200W)*: Surge in demand (+420%) due to CFE summer grid outages and blackouts in Monterrey, CDMX, and Mérida.
+    2. *Solar-Direct Hybrid Inverter Mini-Splits (1.5 Ton)*: Connects straight to 3 rooftop DC panels, bypassing CFE DAC high-consumption penalty tariffs.
+    3. *6-Stage Reverse Osmosis Purifiers with Booster Pump*: Removes 99% limestone *sarro* from deep wells and tap water in Mérida and Bajío.
+    4. *Ultrasonic IoT Cistern & Tinaco Level Sensors*: Surged +510% during CDMX Cutzamala water rationing to protect pumps from running dry.
+    5. *Countertop Compact Portable Dishwashers (5L tank)*: Solves rental apartment friction where kitchens lack 60cm rough-in plumbing.
+    6. *Ultra-Fast Portable Ice Makers (12 kg/24h)*: High demand during 44°C heatwaves when convenience stores run out of ice.
+  * **Problems with Existing Products Tracked**:
+    1. *Basic Ceramic Water Purifiers*: Clog with limestone *sarro* in <14 days in Mérida/Yucatán due to extreme JAPAY water hardness.
+    2. *2000VA Voltage Regulators*: CFE transformer surges burn internal soldered thermal fuses with zero replacement parts in Mexico.
+    3. *Portable 12L Dehumidifiers*: 2L reservoir fills in 3.5 hours under 90%+ tropical coastal humidity, shutting down and heating rooms by 3°C.
+    4. *Booster Pumps with Mechanical Flow Switches*: Mineral calcification freezes flow switches, causing motors to run dry and melt impellers.
+    5. *Evacuated Tube Solar Water Heaters*: Hailstorms in central highlands shatter glass tubes; short magnesium sacrificial anodes corrode in 3 months.
+    6. *Basic Robotic Vacuums with Passive Wet Mops*: Mop drags dirty water over porous Mexican ceramic tile/cantera, smelling sour and slipping on Fabuloso/Pinol.
+* **Database & REST API:**
+  * Expanded SQLite schema in [`agents/dataset_manager.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/agents/dataset_manager.py) with `product_type`, `trend_badge`, `demand_growth`, and `failure_mode`.
+  * Added endpoints in [`app.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/app.py):
+    * `GET /api/mercadolibre/products?product_type=...&category=...`
+    * `GET /api/mercadolibre/hot-products`
+    * `GET /api/mercadolibre/problems`
+* **CLI Runner Upgrades ([`run.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/run.py)):**
+  * Added `--ml-hot`, `--ml-problems`, `--ml-login` (headed browser session/verification capture on `mercadolibre.com.mx`), and dual `--mercadolibre`.
+* **Executive Daily Reports ([`reports/report_generator.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/reports/report_generator.py)):**
+  * Subdivided Section 7 into:
+    * `7.1 🔥 Hot New Products y Nuevas Tendencias de Consumo en México`
+    * `7.2 ⚠️ Fallas Críticas, Defectos y Quejas en Productos Existentes (1-3 Estrellas)`
+* **Dashboard Frontend ([`frontend/index.html`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/frontend/index.html), [`frontend/app.js`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/frontend/app.js), [`frontend/style.css`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/frontend/style.css)):**
+  * Filter pills for `Todos los Artículos`, `🔥 Hot New Products & Tendencias`, and `⚠️ Fallas en Productos Existentes (1-3 ⭐)`.
+  * Category dropdown selector and updated KPI stat counters.
+  * Visual card differentiation (`ml-card-hot` with flame badges and demand acceleration tags vs. `ml-card-problem` with alert badges, failure mode banners, verbatim customer complaints, and redesign hypotheses).
+  * Full bilingual Spanish/English localization.
+* **Live Hetzner Deployment:**
+  * Deployed to `89.167.22.10` via [`deploy_remote.py`](file:///c:/Users/chris/Desktop/Market%20Research%20Mexico/deploy_remote.py).
+  * Containers rebuilt and verified live at [**https://pulse-mexico.com/**](https://pulse-mexico.com/) (HTTP 200 OK across all endpoints).
+
+---
+
+## 9. Final Project Closure & Verification Checklist
 
 | Milestone | Status | Details / URL |
 |---|---|---|
@@ -231,7 +272,7 @@ python run.py --export
 | **Hetzner Cloud VPS Production** | ✅ Live | Running on `89.167.22.10`, HTTPS SSL on [https://pulse-mexico.com/](https://pulse-mexico.com/) |
 | **Release 1.00 Multi-Agent Swarm** | ✅ Active | 8 autonomous agents (Reddit, Twitter, Facebook, WhatsApp, Compliance, Synthesis, Reports, Product Voids) |
 | **Bilingual Support (ES/EN)** | ✅ Complete | Spanish default (`:8000`, `/`, `/es`), English (`/en`), header switcher |
-| **Mercado Libre México Scraper** | ✅ Complete | Dedicated MLM agent, SQLite table, API endpoint, dashboard tab & report section |
+| **Dual Mercado Libre México Harvester** | ✅ Complete | Scrapes Hot New Products & Existing Product Quality Deficiencies with 1-3 star review extraction |
 | **Website Feature User Manual** | ✅ Complete | Fully documented in `USER_MANUAL.md` |
 | **GitHub Remote Synchronization** | ✅ Complete | All commits pushed up-to-date to `origin/main` (`westland/MexicoConsumerPulse`) |
 

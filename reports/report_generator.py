@@ -244,44 +244,81 @@ class DailyReportGenerator:
                 md_lines.append(f"| **{title_short}** | {origin} | {barrier}... | {workaround}... | *{opp}* |")
             md_lines.append("")
 
-        # 7. Mercado Libre México Product Quality & Review Intelligence
-        ml_products = self.db.get_mercadolibre_products(limit=10)
-        if ml_products:
+        # 7. Mercado Libre México Dual Intelligence: Hot New Products & Product Failure Modes
+        hot_products = self.db.get_mercadolibre_hot_products(limit=8)
+        problem_products = self.db.get_mercadolibre_problem_products(limit=8)
+        
+        if hot_products or problem_products:
             if lang == "es":
-                md_lines.append("## 7. Inteligencia de Productos y Reseñas en Mercado Libre México (mercadolibre.com.mx)")
-                md_lines.append("Monitoreo continuo de artículos de alta demanda en México, precios en MXN, calificaciones de usuarios y fallas críticas reportadas por compradores locales debido a incompatibilidades de infraestructura (sarro de agua, sobretensión de CFE, humedad tropical y sobreprecio por falta de distribución minorista formal).\n")
-                md_lines.append("| Producto (mercadolibre.com.mx) | Precio (MXN) | Calificación | Vendedor / Ubicación | Falla en México / Reseña Crítica de Comprador | Oportunidad de Emprendimiento |")
-                md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+                md_lines.append("## 7. Inteligencia de Mercado Libre México (mercadolibre.com.mx)")
+                md_lines.append("Monitoreo dual de bienes de consumo en México: detección de nuevos artículos en tendencia con alta aceleración de ventas, junto con la auditoría de fallas técnicas recurrentes reportadas en reseñas críticas de 1 a 3 estrellas debido a particularidades del entorno mexicano (sarro kárstico, variaciones de CFE, humedad tropical y falta de refacciones).\n")
             else:
-                md_lines.append("## 7. Mercado Libre Mexico Product Quality & Customer Review Intelligence (mercadolibre.com.mx)")
-                md_lines.append("Continuous monitoring of high-demand domestic Mexican listings, MXN pricing, user review ratings, and verified consumer complaints stemming from local conditions (hard water scaling, CFE grid voltage surges, tropical humidity, and retail markups).\n")
-                md_lines.append("| Product (mercadolibre.com.mx) | Price (MXN) | Rating | Seller Location | Local Failure Mode / Verified Mexican Review | Market Opportunity |")
-                md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+                md_lines.append("## 7. Mercado Libre Mexico Dual Intelligence (mercadolibre.com.mx)")
+                md_lines.append("Dual consumer goods monitoring in Mexico: tracking hot breakout product trends with accelerating sales, alongside systematic auditing of product quality defects reported in verified 1-to-3 star customer complaints caused by Mexican environmental realities (limestone scaling, CFE grid surges, tropical humidity, and non-standard fittings).\n")
 
-            for item in ml_products:
-                title_short = item.get('title', '')[:45]
-                price_str = f"${item.get('price_mxn', 0):,.0f} MXN"
-                rating_str = f"{item.get('rating', 0.0)}/5 ({item.get('review_count', 0)} op.)"
-                loc = item.get('seller_location', 'México')[:30]
-                reviews = item.get('reviews', [])
-                review_snip = reviews[0][:80] if reviews else (item.get('problem_summary', '')[:80])
-                opp = (item.get('venture_concept') or item.get('solution_found', ''))[:60]
-                md_lines.append(f"| **{title_short}** | {price_str} | {rating_str} | {loc} | {review_snip}... | *{opp}* |")
-            md_lines.append("")
+            # 7.1 Hot New Products & Breakout Demand
+            if hot_products:
+                if lang == "es":
+                    md_lines.append("### 7.1 🔥 Hot New Products y Nuevas Tendencias de Consumo en México")
+                    md_lines.append("Artículos con mayor tracción, insignias de más vendido y aceleración de volumen ante necesidades emergentes de los hogares mexicanos.\n")
+                    md_lines.append("| Producto (mercadolibre.com.mx) | Precio (MXN) | Insignia / Crecimiento | Ubicación Vendedor | Factor Clave de Adopción en México | Oportunidad de Negocio |")
+                    md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+                else:
+                    md_lines.append("### 7.1 🔥 Hot New Products & Emerging Mexican Consumer Trends")
+                    md_lines.append("Breakout items, best-seller badges, and accelerating sales volume responding to acute domestic consumer needs.\n")
+                    md_lines.append("| Product (mercadolibre.com.mx) | Price (MXN) | Badge / Growth | Seller Location | Key Adoption Driver in Mexico | Business / Venture Opportunity |")
+                    md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
 
-            # Highlight specific customer complaints from Mercado Libre México
-            if lang == "es":
-                md_lines.append("### Quejas Verificadas de Compradores Mexicanos en mercadolibre.com.mx:")
-            else:
-                md_lines.append("### Verified Mexican Consumer Review Callouts on mercadolibre.com.mx:")
-            
-            for item in ml_products[:4]:
-                reviews = item.get('reviews', [])
-                if reviews:
-                    md_lines.append(f"- **{item.get('title')}** (${item.get('price_mxn', 0):,.0f} MXN — {item.get('seller_location')}):")
-                    for rev in reviews[:2]:
-                        md_lines.append(f"  - *\"{rev}\"*")
-            md_lines.append("")
+                for item in hot_products:
+                    title_short = (item.get('title') or '')[:45]
+                    price_str = f"${item.get('price_mxn', 0) or 0:,.0f} MXN"
+                    growth_snip = (item.get('demand_growth') or '')[:30]
+                    badge_str = f"{item.get('trend_badge') or 'MÁS VENDIDO'}"
+                    if growth_snip:
+                        badge_str += f" ({growth_snip})"
+                    loc = (item.get('seller_location') or 'México')[:25]
+                    driver = (item.get('problem_summary') or '')[:85]
+                    opp = ((item.get('venture_concept') or item.get('solution_found')) or '')[:65]
+                    md_lines.append(f"| **{title_short}** | {price_str} | {badge_str} | {loc} | {driver}... | *{opp}* |")
+                md_lines.append("")
+
+            # 7.2 Problems with Existing Products
+            if problem_products:
+                if lang == "es":
+                    md_lines.append("### 7.2 ⚠️ Fallas Críticas, Defectos y Quejas en Productos Existentes (1-3 Estrellas)")
+                    md_lines.append("Artículos comerciales cuya durabilidad se ve comprometida por el sarro de agua, calor extremo o sobretensiones eléctricas en México.\n")
+                    md_lines.append("| Producto Afectado | Precio (MXN) | Calificación | Falla Técnica en México | Cita de Comprador Mexicano | Oportunidad de Rediseño / Emprendimiento |")
+                    md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+                else:
+                    md_lines.append("### 7.2 ⚠️ Critical Flaws, Quality Failures & Verified Complaints (1-3 Stars)")
+                    md_lines.append("Commercial products failing prematurely due to hard limestone water, extreme heat, or electrical surges across Mexican states.\n")
+                    md_lines.append("| Impacted Product | Price (MXN) | Rating | Technical Failure Mode in Mexico | Verified Buyer Quote | Redesign & Venture Opportunity |")
+                    md_lines.append("| :--- | :--- | :--- | :--- | :--- | :--- |")
+
+                for item in problem_products:
+                    title_short = (item.get('title') or '')[:45]
+                    price_str = f"${item.get('price_mxn', 0) or 0:,.0f} MXN"
+                    rating_str = f"{item.get('rating', 0.0)}/5 ({item.get('review_count', 0)} op.)"
+                    failure = ((item.get('failure_mode') or item.get('problem_summary')) or '')[:75]
+                    reviews = item.get('reviews') or []
+                    review_snip = (reviews[0][:75] if reviews else "Falla reportada en condiciones de uso local")
+                    opp = ((item.get('venture_concept') or item.get('solution_found')) or '')[:65]
+                    md_lines.append(f"| **{title_short}** | {price_str} | {rating_str} | {failure}... | \"{review_snip}...\" | *{opp}* |")
+                md_lines.append("")
+
+                # Highlight specific customer complaints from Mercado Libre México
+                if lang == "es":
+                    md_lines.append("### Quejas Verificadas de Compradores Mexicanos en mercadolibre.com.mx:")
+                else:
+                    md_lines.append("### Verified Mexican Consumer Review Callouts on mercadolibre.com.mx:")
+                
+                for item in problem_products[:4]:
+                    reviews = item.get('reviews', [])
+                    if reviews:
+                        md_lines.append(f"- **{item.get('title')}** (${item.get('price_mxn', 0):,.0f} MXN — {item.get('seller_location')}):")
+                        for rev in reviews[:2]:
+                            md_lines.append(f"  - *\"{rev}\"*")
+                md_lines.append("")
 
         if lang == "es":
             md_lines.append("## 8. Citas Textuales Anónimas del Campo")

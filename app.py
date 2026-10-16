@@ -181,17 +181,18 @@ def get_agents_activity():
             },
             {
                 "id": "mercadolibre",
-                "name": "Mercado Libre México Product & Review Scraper",
+                "name": "Mercado Libre México: Hot Products & Problem Harvester",
                 "icon": "🛒",
                 "status": "Active • Monitoring México",
                 "target": "https://www.mercadolibre.com.mx/ (Only México MLM Items)",
                 "records_harvested": len(ml_agent.get_products()),
-                "action_summary": "Scrapes product details, MXN pricing, and verified Mexican customer reviews/complaints on regional product failures.",
+                "action_summary": "Scrapes hot new breakout products, trending consumer demand, and critical 1-3 star reviews highlighting product failures across Mexico.",
                 "key_findings": [
-                    "Water purifiers failing within 2 weeks due to Mérida & Yucatan limestone sarro",
-                    "CFE power surges burning refrigerator compressor electronics in Monterrey and GDL",
-                    "Tropical humidity (90%+) overwhelming standard 2L dehumidifier tanks in coastal Mexico",
-                    "Compact countertop dishwashers sold at 100% markup over US prices due to domestic big-box omission"
+                    "Hot Trend: LiFePO4 portable power stations & solar minisplits exploding due to CFE grid blackouts (+420% demand)",
+                    "Hot Trend: Ultrasonic tinaco/cisterna IoT level switches surging +510% amidst CDMX water cuts",
+                    "Failure Mode: Water purifiers clogging in <14 days from Mérida & Yucatán limestone sarro",
+                    "Failure Mode: CFE voltage spikes destroying refrigerator compressors with unreplaceable soldered fuses",
+                    "Failure Mode: Standard 2L dehumidifier tanks overflowing in 3.5 hours under 90% tropical coastal humidity"
                 ]
             }
         ],
@@ -359,8 +360,20 @@ def list_reports():
     return reports
 
 @app.get("/api/mercadolibre/products")
-def get_mercadolibre_products(limit: int = Query(50, ge=1, le=100)):
-    return ml_agent.get_products(limit=limit)
+def get_mercadolibre_products(
+    product_type: Optional[str] = Query(None),
+    category: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=100)
+):
+    return ml_agent.get_products(product_type=product_type, category=category, limit=limit)
+
+@app.get("/api/mercadolibre/hot-products")
+def get_mercadolibre_hot_products(limit: int = Query(50, ge=1, le=100)):
+    return ml_agent.get_hot_new_products(limit=limit)
+
+@app.get("/api/mercadolibre/problems")
+def get_mercadolibre_product_problems(limit: int = Query(50, ge=1, le=100)):
+    return ml_agent.get_product_problems(limit=limit)
 
 def _run_agent_task(agent_name: str):
     cmd = [sys.executable, str(BASE_DIR / "run.py")]

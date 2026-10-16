@@ -11,6 +11,8 @@ let currentVoidOrigin = "All";
 let allProblems = [];
 let allProductVoids = [];
 let allMLProducts = [];
+let currentMLType = "ALL";
+let currentMLCategory = "ALL";
 let latestReportData = null;
 
 // Comprehensive Bilingual Translation Dictionary
@@ -98,18 +100,22 @@ const TRANSLATIONS = {
 
     // Tab 6: Mercado Libre México
     "ml-live-badge": "Solo Mercado Libre México (mercadolibre.com.mx)",
-    "ml-tab-title": "Mercado Libre México: Precios, Calidad y Quejas de Consumidores",
-    "ml-tab-subtitle": "Scraping y análisis exclusivo de mercadolibre.com.mx en artículos con fricción por sarro de agua en Yucatán, sobretensiones de CFE y sobreprecios por falta de inventario minorista formal.",
-    "btn-run-ml-label": "Ejecutar Scraper Mercado Libre",
+    "ml-tab-title": "Mercado Libre México: Hot New Products y Fallas en Productos Existentes",
+    "ml-tab-subtitle": "Scraping dual y análisis continuo en mercadolibre.com.mx: 1) Detección de artículos en tendencia y nuevos productos con alta aceleración de demanda; 2) Extracción de quejas, fallas de calidad y reseñas críticas (1-3 estrellas) por sarro en Yucatán, variaciones de CFE y clima tropical.",
+    "btn-run-ml-label": "Ejecutar Scraper Dual MLM",
     "btn-visit-ml-label": "Visitar MLM ↗",
-    "ml-kpi-tracked-label": "Productos Clave Monitoreados",
-    "ml-kpi-tracked-sub": "Filtros, Reguladores, Deshumidificadores",
-    "ml-kpi-rating-label": "Calificación Promedio",
-    "ml-kpi-rating-sub": "1,950+ Reseñas analizadas en México",
+    "ml-kpi-hot-label": "🔥 Hot New Products Monitoreados",
+    "ml-kpi-hot-sub": "Baterías LiFePO4, Minisplits Solares, IoT Tinacos",
+    "ml-kpi-problems-label": "⚠️ Fallas Críticas Identificadas",
+    "ml-kpi-problems-sub": "Sarro kárstico, Picos CFE, Humedad 90%+",
+    "ml-kpi-rating-label": "Reseñas Verificadas Analizadas",
+    "ml-kpi-rating-sub": "Citas textuales de compradores mexicanos",
     "ml-kpi-price-label": "Rango de Precios en MXN",
-    "ml-kpi-price-sub": "Precios en pesos con envío en México",
-    "ml-kpi-friction-label": "Alertas Críticas de Calidad",
-    "ml-kpi-friction-sub": "Sarro kárstico, CFE y clima tropical",
+    "ml-kpi-price-sub": "Precios en pesos mexicanos con envío nacional",
+    "ml-filter-all-label": "Todos los Artículos",
+    "ml-filter-hot-label": "🔥 Hot New Products & Tendencias",
+    "ml-filter-problems-label": "⚠️ Fallas en Productos Existentes (1-3 ⭐)",
+    "ml-cat-label": "Categoría:",
 
     // Tab 7: Agents
     "audit-badge-title": "Auditoría Ejecutiva del Enjambre",
@@ -203,18 +209,22 @@ const TRANSLATIONS = {
 
     // Tab 6: Mercado Libre México
     "ml-live-badge": "Exclusively Mercado Libre Mexico (mercadolibre.com.mx)",
-    "ml-tab-title": "Mercado Libre Mexico: Pricing, Quality & Consumer Complaints",
-    "ml-tab-subtitle": "Continuous scraping and intelligence extraction from mercadolibre.com.mx on products facing Yucatan hard water sarro, CFE voltage spikes, and retail import markups.",
-    "btn-run-ml-label": "Run Mercado Libre Scraper",
+    "ml-tab-title": "Mercado Libre Mexico: Hot New Products & Existing Product Failures",
+    "ml-tab-subtitle": "Dual scraping & intelligence from mercadolibre.com.mx: 1) Identification of breakout trending products and rapid-growth innovations; 2) Extraction of customer complaints, defect reports, and critical 1-3 star reviews caused by Yucatan limestone water, CFE grid surges, and tropical climate.",
+    "btn-run-ml-label": "Run Dual MLM Scraper",
     "btn-visit-ml-label": "Visit MLM ↗",
-    "ml-kpi-tracked-label": "Key Tracked Products",
-    "ml-kpi-tracked-sub": "Water Filters, Surge Protectors, Dehumidifiers",
-    "ml-kpi-rating-label": "Average User Rating",
-    "ml-kpi-rating-sub": "1,950+ Reviews analyzed across Mexico",
+    "ml-kpi-hot-label": "🔥 Tracked Hot New Products",
+    "ml-kpi-hot-sub": "LiFePO4 Batteries, Solar ACs, IoT Tinaco Switches",
+    "ml-kpi-problems-label": "⚠️ Critical Failure Alerts",
+    "ml-kpi-problems-sub": "Limestone scaling, CFE surges & 90%+ humidity",
+    "ml-kpi-rating-label": "Verified Buyer Reviews Analyzed",
+    "ml-kpi-rating-sub": "Direct customer quotes from Mexican shoppers",
     "ml-kpi-price-label": "Price Range (MXN)",
     "ml-kpi-price-sub": "MXN peso pricing with nationwide shipping",
-    "ml-kpi-friction-label": "Critical Failure Alerts",
-    "ml-kpi-friction-sub": "Limestone scaling, CFE surges & tropical climate",
+    "ml-filter-all-label": "All Products",
+    "ml-filter-hot-label": "🔥 Hot New Products & Trends",
+    "ml-filter-problems-label": "⚠️ Existing Product Problems (1-3 ⭐)",
+    "ml-cat-label": "Category:",
 
     // Tab 7: Agents
     "audit-badge-title": "Swarm Executive Audit",
@@ -317,7 +327,7 @@ function setLanguage(lang, triggerReload = true) {
     loadLatestReport(currentRegion, currentLang);
     renderFilteredProblems();
     filterAndRenderProductVoids();
-    renderMercadoLibreProducts(allMLProducts);
+    renderMercadoLibreProducts(getFilteredMLProducts());
   }
 }
 
@@ -718,35 +728,73 @@ function renderVentureOpportunities(problems) {
   }).join("");
 }
 
-// 9. Mercado Libre México Intelligence Loader & Renderer
+// 9. Mercado Libre México Dual Intelligence Loader & Renderer
+function filterMLByType(type) {
+  currentMLType = type;
+  const btnAll = document.getElementById("ml-filter-all");
+  const btnHot = document.getElementById("ml-filter-hot");
+  const btnProb = document.getElementById("ml-filter-problems");
+
+  if (btnAll) btnAll.classList.toggle("active", type === "ALL");
+  if (btnHot) btnHot.classList.toggle("active", type === "HOT_NEW_PRODUCT");
+  if (btnProb) btnProb.classList.toggle("active", type === "EXISTING_PRODUCT_PROBLEMS");
+
+  renderMercadoLibreProducts(getFilteredMLProducts());
+}
+
+function filterMLByCategory(cat) {
+  currentMLCategory = cat;
+  renderMercadoLibreProducts(getFilteredMLProducts());
+}
+
+function getFilteredMLProducts() {
+  return allMLProducts.filter(item => {
+    const matchesType = (currentMLType === "ALL") || (item.product_type === currentMLType);
+    const matchesCat = (currentMLCategory === "ALL") || (item.category === currentMLCategory);
+    return matchesType && matchesCat;
+  });
+}
+
 async function loadMercadoLibreProducts() {
   const grid = document.getElementById("mercadolibre-products-grid");
   try {
-    const res = await fetch("/api/mercadolibre/products");
+    const res = await fetch("/api/mercadolibre/products?limit=100");
     allMLProducts = await res.json();
 
     // Update Quick Stats
-    const totalEl = document.getElementById("ml-stat-total");
-    const ratingEl = document.getElementById("ml-stat-rating");
-    const rangeEl = document.getElementById("ml-stat-range");
+    const hotCount = allMLProducts.filter(p => p.product_type === "HOT_NEW_PRODUCT").length;
+    const problemCount = allMLProducts.filter(p => p.product_type === "EXISTING_PRODUCT_PROBLEMS").length;
     const countBadge = document.getElementById("ml-count-badge");
+    const hotEl = document.getElementById("ml-stat-hot");
+    const probEl = document.getElementById("ml-stat-problems");
+    const rangeEl = document.getElementById("ml-stat-range");
+    const reviewsEl = document.getElementById("ml-stat-reviews");
 
-    if (totalEl) totalEl.textContent = `${allMLProducts.length} ${currentLang === "es" ? "Artículos" : "Items"}`;
-    if (countBadge) countBadge.textContent = `${allMLProducts.length} ${currentLang === "es" ? "Productos Monitoreados" : "Tracked Products"}`;
-    
+    if (countBadge) {
+      countBadge.textContent = `${allMLProducts.length} ${currentLang === "es" ? "Artículos Analizados" : "Analyzed Items"}`;
+    }
+    if (hotEl) {
+      hotEl.textContent = `${hotCount} ${currentLang === "es" ? "Artículos" : "Items"}`;
+    }
+    if (probEl) {
+      probEl.textContent = `${problemCount} ${currentLang === "es" ? "Defectos" : "Flaws"}`;
+    }
+
     if (allMLProducts.length > 0) {
-      const avgRating = (allMLProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / allMLProducts.length).toFixed(1);
-      if (ratingEl) ratingEl.textContent = `${avgRating} / 5.0`;
-
       const prices = allMLProducts.map(p => p.price_mxn).filter(p => p > 0);
       if (prices.length > 0 && rangeEl) {
         const minP = Math.min(...prices);
         const maxP = Math.max(...prices);
         rangeEl.textContent = `$${minP.toLocaleString()} – $${maxP.toLocaleString()}`;
       }
+
+      const totalReviews = allMLProducts.reduce((sum, p) => sum + (p.review_count || 0), 0);
+      if (reviewsEl) {
+        reviewsEl.textContent = `${totalReviews.toLocaleString()}+ ${currentLang === "es" ? "Opiniones" : "Reviews"}`;
+      }
     }
 
-    renderMercadoLibreProducts(allMLProducts);
+    renderMercadoLibreProducts(getFilteredMLProducts());
   } catch (err) {
     console.error("Failed to load Mercado Libre products:", err);
     if (grid) grid.innerHTML = "<p>Error loading Mercado Libre data.</p>";
@@ -759,67 +807,105 @@ function renderMercadoLibreProducts(products) {
 
   if (!products.length) {
     grid.innerHTML = `
-      <div class="empty-state glass-panel" style="grid-column: 1 / -1; padding: 32px; text-align: center;">
-        <span style="font-size: 32px;">🛒</span>
-        <h3 style="margin-top: 8px;">${currentLang === "es" ? "No se han registrado productos de Mercado Libre" : "No Mercado Libre products recorded"}</h3>
-        <p style="color: var(--text-muted); font-size: 13px;">${currentLang === "es" ? "Haga clic en 'Ejecutar Scraper Mercado Libre' para escanear." : "Click 'Run Mercado Libre Scraper' to harvest items."}</p>
+      <div class="empty-state glass-panel" style="grid-column: 1 / -1; padding: 40px; text-align: center;">
+        <span style="font-size: 38px;">🛒</span>
+        <h3 style="margin-top: 10px; color: #fff;">${currentLang === "es" ? "No se encontraron productos con estos filtros" : "No products found matching filters"}</h3>
+        <p style="color: var(--text-muted); font-size: 13px; max-width: 500px; margin: 6px auto;">
+          ${currentLang === "es" ? "Pruebe seleccionando 'Todos los Artículos' o ejecute el scraper dual para cosechar datos frescos." : "Try selecting 'All Products' or run the dual scraper to harvest fresh data."}
+        </p>
       </div>
     `;
     return;
   }
 
   grid.innerHTML = products.map(item => {
+    const isHot = item.product_type === "HOT_NEW_PRODUCT";
     const reviews = item.reviews || [];
-    const ratingStars = "⭐".repeat(Math.round(item.rating || 4));
+    const ratingStars = "⭐".repeat(Math.min(5, Math.max(1, Math.round(item.rating || (isHot ? 5 : 3)))));
+    const cardClass = isHot ? "ml-card-hot" : "ml-card-problem";
+    const badgeHtml = isHot
+      ? `<span class="ml-badge-hot">${escapeHtml(item.trend_badge || "🔥 MÁS VENDIDO #1")}</span>`
+      : `<span class="ml-badge-problem">${escapeHtml(item.trend_badge || "⚠️ FALLA REGIONAL")}</span>`;
 
     return `
-      <div class="problem-card glass-panel" style="border-top: 3px solid #ffe600; display: flex; flex-direction: column; justify-content: space-between;">
+      <div class="problem-card glass-panel ${cardClass}" style="display: flex; flex-direction: column; justify-content: space-between;">
         <div>
+          <!-- Card Header -->
           <div class="problem-card-header">
-            <span class="badge badge-ml">🛒 ${escapeHtml(item.mlm_id || "MLM México")}</span>
-            <span class="ml-rating-tag">${ratingStars} ${item.rating}/5 (${item.review_count} ${currentLang === "es" ? "opiniones" : "reviews"})</span>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="badge badge-ml">🛒 ${escapeHtml(item.mlm_id || "MLM México")}</span>
+              ${badgeHtml}
+            </div>
+            <span class="ml-rating-tag" style="${isHot ? '' : 'color: var(--accent-red); font-weight: 800;'}">
+              ${ratingStars} ${Number(item.rating || 0).toFixed(1)}/5 (${item.review_count} ${currentLang === "es" ? "op." : "rev."})
+            </span>
           </div>
 
-          <h4 class="problem-title" style="color: #fff; font-size: 15px; margin: 10px 0 4px;">
+          <!-- Product Title -->
+          <h4 class="problem-title" style="color: #fff; font-size: 15px; margin: 12px 0 6px; line-height: 1.35;">
             ${escapeHtml(item.title)}
           </h4>
 
-          <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 12px;">
+          <!-- Price & Seller Location -->
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin: 8px 0 12px; flex-wrap: wrap; gap: 6px;">
             <div class="ml-price-tag">$${Number(item.price_mxn || 0).toLocaleString()} MXN</div>
             <div class="ml-seller-loc">📍 ${escapeHtml(item.seller_location || "México (Envío Full)")}</div>
           </div>
 
-          <!-- Problem / Friction Alert -->
-          <div style="background: rgba(255, 71, 87, 0.08); border-left: 2px solid var(--accent-red); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: var(--text-main);">
-            <strong style="color: var(--accent-red);">⚠️ ${currentLang === "es" ? "Falla Regional Crítica" : "Regional Friction Alert"}:</strong> 
-            ${escapeHtml(item.problem_summary || "Incompatibilidad reportada con infraestructura local mexicana.")}
-          </div>
+          <!-- Trend Growth or Failure Mode Banner -->
+          ${isHot ? `
+            ${item.demand_growth ? `
+              <div style="margin: 8px 0;">
+                <div class="ml-growth-tag">
+                  📈 <strong>${currentLang === "es" ? "Aceleración de Demanda:" : "Demand Growth:"}</strong> ${escapeHtml(item.demand_growth)}
+                </div>
+              </div>
+            ` : ''}
 
-          <!-- Customer Verbatim Reviews -->
-          <div style="margin: 10px 0;">
-            <div style="font-size: 11px; font-weight: 700; color: #ffe600; text-transform: uppercase;">
-              ${currentLang === "es" ? "💬 Reseñas Reales de Compradores Mexicanos:" : "💬 Verified Mexican Buyer Reviews:"}
+            <div style="background: rgba(0, 230, 153, 0.06); border-left: 2px solid var(--accent-green); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: var(--text-main);">
+              <strong style="color: var(--accent-green);">💡 ${currentLang === "es" ? "Factor Clave de Adopción en México:" : "Adoption Driver in Mexico:"}</strong>
+              <div style="margin-top: 2px;">${escapeHtml(item.problem_summary || "Alta demanda por resiliencia y ahorro energético en hogares mexicanos.")}</div>
             </div>
-            ${reviews.map(r => `
-              <div class="ml-review-card">"${escapeHtml(r)}"</div>
+          ` : `
+            <div style="background: rgba(255, 71, 87, 0.08); border-left: 2px solid var(--accent-red); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 12px; color: var(--text-main);">
+              <strong style="color: var(--accent-red);">💥 ${currentLang === "es" ? "Falla Regional Crítica en México:" : "Critical Failure Mode in Mexico:"}</strong>
+              <div style="margin-top: 2px;">${escapeHtml(item.failure_mode || item.problem_summary || "Incompatibilidad reportada con infraestructura local mexicana.")}</div>
+            </div>
+          `}
+
+          <!-- Customer Verbatim Quotes from mercadolibre.com.mx -->
+          <div style="margin: 10px 0;">
+            <div style="font-size: 11px; font-weight: 700; color: #ffe600; text-transform: uppercase; letter-spacing: 0.4px;">
+              ${isHot 
+                ? (currentLang === "es" ? "💬 Reseñas Verificadas de Compradores en México:" : "💬 Verified Buyer Reviews on MLM:")
+                : (currentLang === "es" ? "⚠️ Quejas Verificadas de Compradores (1-3 ⭐):" : "⚠️ Verified Critical Complaints (1-3 ⭐):")}
+            </div>
+            ${reviews.slice(0, 3).map(r => `
+              <div class="ml-review-card" style="${isHot ? '' : 'border-left-color: var(--accent-red);'}">"${escapeHtml(r)}"</div>
             `).join("")}
           </div>
 
-          <!-- Solution Found & Workaround -->
+          <!-- Solution / Current Workaround -->
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px dashed rgba(255, 255, 255, 0.1); border-radius: 4px; padding: 8px 12px; margin: 8px 0; font-size: 11px;">
-            <span style="color: var(--text-dim); font-weight: 700;">${currentLang === "es" ? "SOLUCIÓN ACTUAL" : "CURRENT WORKAROUND"}:</span>
-            <div style="color: var(--text-main); margin-top: 2px;">${escapeHtml(item.solution_found || "Compra de adaptadores adicionales o reemplazos continuos.")}</div>
+            <span style="color: var(--text-dim); font-weight: 700;">${currentLang === "es" ? "SOLUCIÓN ACTUAL / EN EL MERCADO" : "CURRENT WORKAROUND"}:</span>
+            <div style="color: var(--text-main); margin-top: 2px;">${escapeHtml(item.solution_found || "Adquisición de adaptadores o reemplazo frecuente.")}</div>
           </div>
         </div>
 
         <div>
+          <!-- Venture Concept / Startup Opportunity -->
           ${item.venture_concept ? `
-            <div class="problem-opp-box" style="margin-top: 10px; border-color: rgba(255, 230, 0, 0.3);">
-              <div class="problem-opp-title" style="color: #ffe600;">💡 ${currentLang === "es" ? "Oportunidad de Emprendimiento y Arbitraje" : "Venture Opportunity & Local Parity"}</div>
-              <div style="font-size: 12px;"><strong>${escapeHtml(item.venture_concept)}</strong></div>
+            <div class="problem-opp-box" style="margin-top: 10px; border-color: ${isHot ? 'rgba(255, 152, 0, 0.35)' : 'rgba(255, 230, 0, 0.3)'};">
+              <div class="problem-opp-title" style="color: ${isHot ? '#ff9800' : '#ffe600'};">
+                💡 ${isHot 
+                  ? (currentLang === "es" ? "Oportunidad de Mercado & Expansión D2C" : "Market Opportunity & D2C Scaling")
+                  : (currentLang === "es" ? "Oportunidad de Rediseño / Emprendimiento" : "Redesign & Venture Opportunity")}
+              </div>
+              <div style="font-size: 12px; margin-top: 3px;"><strong>${escapeHtml(item.venture_concept)}</strong></div>
             </div>
           ` : ''}
 
+          <!-- External Link Button -->
           <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
             <a href="${escapeHtml(item.url || 'https://www.mercadolibre.com.mx/')}" target="_blank" class="btn btn-secondary btn-sm" style="font-size: 11px;">
               ${currentLang === "es" ? "Ver Artículo en Mercado Libre ↗" : "View on Mercado Libre ↗"}
