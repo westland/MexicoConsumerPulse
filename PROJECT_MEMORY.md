@@ -157,6 +157,7 @@ python run.py --export
 | `INSTALL_RELEASE_1.0.bat` | 1-click Windows installer for Release 1.00 |
 | `install_release_1.0.sh` | 1-click Linux/macOS installer for Release 1.00 |
 | `START_LOCAL_WEBSITE.bat` | 1-click local web dashboard launcher |
+| `USER_MANUAL.md` | Complete website feature manual and operational documentation |
 | `Nuveen_Grants_..._filled.pdf` | Completed UIC Nuveen grant budget application form |
 
 ---

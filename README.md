@@ -12,6 +12,7 @@ An end-to-end multi-agent market research and retail intelligence platform built
 
 * 🌐 **Live Cloud Production Portal:** [**https://pulse-mexico.com/**](https://pulse-mexico.com/)
 * 📚 **API Swagger Documentation:** [**https://pulse-mexico.com/docs**](https://pulse-mexico.com/docs)
+* 📖 **Website User Manual & Feature Guide:** [**`USER_MANUAL.md`**](USER_MANUAL.md)
 * 🐙 **GitHub Repository:** [**https://github.com/westland/MexicoConsumerPulse**](https://github.com/westland/MexicoConsumerPulse)
 
 ---
@@ -71,6 +72,7 @@ c:\Users\chris\Desktop\Market Research Mexico\
 ├── deploy_hetzner.sh         # One-click automated installer for Hetzner Cloud Linux servers
 ├── Dockerfile                # Production Docker image with headless Playwright Chromium
 ├── docker-compose.yml        # Docker Compose configuration (Web UI + Daily Scheduler)
+├── USER_MANUAL.md            # Complete website user manual & non-obvious feature guide
 ├── HETZNER_DEPLOYMENT_GUIDE.md # Complete Hetzner VPS setup manual
 ├── hetzner/                  # Production systemd services and Nginx SSL configuration
 ├── requirements.txt          # Python dependencies
